@@ -3,29 +3,33 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "main": "dist/index.js",
+  "main": "dist/app.js",
+  "exports": {
+    ".": "./dist/app.js"
+  },
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc -p tsconfig.json",
     "start": "node dist/index.js",
     "seed": "tsx src/seed.ts",
     "seed:reset": "tsx src/seed.ts --force",
+    "migrate": "node dist/seed.js",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "better-sqlite3": "^11.7.0",
     "cookie-parser": "^1.4.7",
     "express": "^4.21.2",
     "multer": "^2.2.0",
-    "nodemailer": "^9.0.6"
+    "nodemailer": "^9.0.6",
+    "pg": "^8.23.0"
   },
   "devDependencies": {
-    "@types/better-sqlite3": "^7.6.12",
     "@types/cookie-parser": "^1.4.8",
     "@types/express": "^4.17.21",
     "@types/multer": "^1.4.12",
     "@types/node": "^22.10.5",
     "@types/nodemailer": "^8.0.1",
+    "@types/pg": "^8.23.1",
     "tsx": "^4.19.2",
     "typescript": "^5.7.3"
   }

@@ -1,29 +1,11 @@
 import crypto from 'node:crypto'
-import path from 'node:path'
 import multer from 'multer'
-import { PROOF_DIR, PRODUCT_IMG_DIR } from './db.js'
+import { exec, queryOne } from './db.js'
 
 const MAX_UPLOAD_BYTES = 8 * 1024 * 1024
 
-const EXTENSIONS: Record<string, string> = {
-  'image/jpeg': '.jpg',
-  'image/png': '.png',
-  'image/webp': '.webp',
-  'image/gif': '.gif',
-  'application/pdf': '.pdf',
-}
-
-/**
- * Filenames are generated, never taken from the client: the original name is
- * kept in the database for display only, so a crafted name cannot escape the
- * upload directory or be replayed as an extension.
- */
-function storage(destination: string) {
-  return multer.diskStorage({
-    destination: (_req, _file, cb) => cb(null, destination),
-    filename: (_req, file, cb) => cb(null, crypto.randomUUID() + (EXTENSIONS[file.mimetype] ?? '.bin')),
-  })
-}
+const PROOF_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'application/pdf']
+const PHOTO_TYPES = ['image/jpeg', 'image/png', 'image/webp']
 
 const accept = (allowed: string[]) => (
   _req: Express.Request,
@@ -37,21 +19,23 @@ const accept = (allowed: string[]) => (
   cb(null, true)
 }
 
-/** Transfer receipts: screenshot or PDF. */
+/**
+ * Everything is uploaded into memory and then written to Postgres: serverless
+ * instances get no writable, persistent disk.
+ */
 export const proofUpload = multer({
-  storage: storage(PROOF_DIR),
+  storage: multer.memoryStorage(),
   limits: { fileSize: MAX_UPLOAD_BYTES, files: 1 },
-  fileFilter: accept(['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'application/pdf']),
+  fileFilter: accept(PROOF_TYPES),
 })
 
-/** Product photos added from the back-office. */
 export const productImageUpload = multer({
-  storage: storage(PRODUCT_IMG_DIR),
+  storage: multer.memoryStorage(),
   limits: { fileSize: MAX_UPLOAD_BYTES, files: 1 },
-  fileFilter: accept(['image/jpeg', 'image/png', 'image/webp']),
+  fileFilter: accept(PHOTO_TYPES),
 })
 
-/** Catalogue import: kept in memory, parsed and discarded. */
+/** Catalogue import: parsed and discarded, never stored. */
 export const csvUpload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 2 * 1024 * 1024, files: 1 },
@@ -67,8 +51,39 @@ export const csvUpload = multer({
   },
 })
 
-export const proofPath = (filename: string) => path.join(PROOF_DIR, filename)
-export const productImagePath = (filename: string) => path.join(PRODUCT_IMG_DIR, filename)
+export type FileKind = 'proof' | 'product'
+
+export interface StoredFile {
+  id: string
+  mime: string
+  filename: string
+  bytes: Buffer
+}
+
+/**
+ * Stores an upload and returns its id. The client's filename is kept for
+ * display only — it never becomes a path or an identifier.
+ */
+export async function storeFile(kind: FileKind, file: Express.Multer.File): Promise<string> {
+  const id = crypto.randomUUID()
+  await exec(
+    'INSERT INTO files (id, kind, mime, filename, bytes, size_bytes) VALUES ($1, $2, $3, $4, $5, $6)',
+    [id, kind, file.mimetype, file.originalname, file.buffer, file.size],
+  )
+  return id
+}
+
+export async function readFile(id: string): Promise<StoredFile | undefined> {
+  return queryOne<StoredFile>('SELECT id, mime, filename, bytes FROM files WHERE id = $1', [id])
+}
+
+export async function deleteFile(id: string): Promise<void> {
+  await exec('DELETE FROM files WHERE id = $1', [id])
+}
 
 /** Public URL of an admin-uploaded product photo. */
-export const productImageUrl = (filename: string) => `/api/media/products/${filename}`
+export const productImageUrl = (id: string) => `/api/media/products/${id}`
+
+/** Extracts the file id back out of a stored product image URL. */
+export const productImageId = (image: string) =>
+  image.startsWith('/api/media/products/') ? image.slice('/api/media/products/'.length) : null

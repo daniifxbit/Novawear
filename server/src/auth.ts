@@ -13,10 +13,19 @@ export const ADMIN_CODE = (process.env.ADMIN_CODE ?? 'NOVA').trim()
 export const IS_DEMO_CODE = ADMIN_CODE.toUpperCase() === 'NOVA'
 
 /**
- * Signing key for session cookies. Without SESSION_SECRET a random key is
- * generated at boot, which simply invalidates sessions on restart.
+ * Signing key for session cookies. It must be configured in production:
+ * serverless instances are created constantly, and a per-instance random key
+ * would sign sessions no other instance can verify — logging the admin out on
+ * essentially every request.
  */
-const SECRET = process.env.SESSION_SECRET ?? crypto.randomBytes(32).toString('hex')
+const SECRET = process.env.SESSION_SECRET ?? fallbackSecret()
+
+function fallbackSecret(): string {
+  if (process.env.NODE_ENV === 'production' || process.env.VERCEL) {
+    throw new Error('SESSION_SECRET est obligatoire en production — définis-le dans les variables d’environnement.')
+  }
+  return crypto.randomBytes(32).toString('hex')
+}
 
 const sign = (payload: string) => crypto.createHmac('sha256', SECRET).update(payload).digest('base64url')
 

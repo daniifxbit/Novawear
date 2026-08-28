@@ -11,7 +11,8 @@ Design. Les transcriptions de conception sont conservées dans `chats/`.
 | Partie   | Technologie                                          |
 | -------- | ---------------------------------------------------- |
 | `web/`   | React 18 + TypeScript + Vite                          |
-| `server/`| Node + Express + SQLite (`better-sqlite3`)            |
+| `server/`| Node + Express + PostgreSQL (`pg`)                     |
+| `api/`   | Point d'entrée serverless Vercel (le même app Express) |
 
 Le front-end est une application à vue unique : la navigation se fait par état,
 comme dans le design d'origine. Les prix, frais de port et références de commande
@@ -19,19 +20,55 @@ sont calculés côté serveur — jamais transmis par le client.
 
 ## Démarrage
 
+Il faut une base PostgreSQL. En local :
+
 ```bash
+createdb novawear
+export DATABASE_URL="postgresql://<user>@localhost:5432/novawear"
+
 npm install
+npm run migrate  # crée les tables et sème les 329 articles
 npm run dev      # API sur :4000, front sur :5173 (proxy /api → :4000)
 ```
 
-Le catalogue est semé automatiquement au premier démarrage (329 articles).
+Le semis tourne aussi au démarrage du serveur, mais **n'insère que les articles
+manquants** : les modifications faites depuis le back-office ne sont jamais
+écrasées. `npm run seed:reset` force le retour aux valeurs générées — et détruit
+donc ces modifications.
 
-Le semis tourne à chaque démarrage mais **n'insère que les articles manquants** :
-les modifications faites depuis le back-office ne sont jamais écrasées.
-`npm run seed:reset` force le retour aux valeurs générées — et détruit donc ces
-modifications.
+### Déploiement sur Vercel
 
-### Production
+Le site tourne en deux morceaux : le front construit est servi en statique
+depuis le CDN, et **toute l'API passe par une seule fonction serverless**
+(`api/index.mjs`, qui expose l'application Express telle quelle). `vercel.json`
+fait le routage.
+
+1. **Créer la base.** Onglet Storage du projet Vercel → Postgres (Neon), ou un
+   compte Neon séparé. Récupérer la chaîne de connexion **« pooled »** : en
+   serverless, chaque invocation ouvre sa propre connexion, et la chaîne directe
+   épuiserait la base.
+2. **Renseigner les variables** dans Settings → Environment Variables, pour
+   *Production*, *Preview* **et *Build*** — la migration tourne pendant le build :
+
+   | Variable         | Rôle                                                     |
+   | ---------------- | -------------------------------------------------------- |
+   | `DATABASE_URL`   | chaîne de connexion pooled (obligatoire)                  |
+   | `SESSION_SECRET` | signe les sessions admin (obligatoire, voir plus bas)     |
+   | `ADMIN_CODE`     | code d'accès au back-office                               |
+   | `PUBLIC_URL`     | `https://<ton-domaine>` — base des liens dans les emails  |
+   | `SMTP_*`, `MAIL_FROM`, `ADMIN_EMAIL` | envoi des emails (voir `.env.example`) |
+
+3. **Déployer.** Le build enchaîne : compilation du serveur → migration et semis
+   du catalogue → build du front.
+
+`SESSION_SECRET` n'est pas optionnel ici. Les instances serverless sont créées
+en permanence ; sans clé fixe, chacune signerait les sessions avec une clé que
+les autres ne peuvent pas vérifier, et l'admin serait déconnecté à presque
+chaque requête. Le serveur refuse donc de démarrer sans elle en production.
+
+### Production sur un processus unique
+
+Le serveur reste déployable classiquement, sans Vercel :
 
 ```bash
 npm run build
@@ -40,10 +77,7 @@ npm start        # sert l'API et le front construit sur le même port
 
 ### Variables d'environnement
 
-Voir `.env.example`. En production, `ADMIN_CODE` et `SESSION_SECRET` sont
-indispensables : sans eux le code de démonstration `NOVA` reste actif et les
-sessions admin sont invalidées à chaque redémarrage. Le serveur l'affiche au
-démarrage.
+Voir `.env.example`.
 
 ## Parcours client
 
@@ -151,7 +185,15 @@ mêmes références, noms, prix, tailles, badges et affectations de photos. Les 
 photos vivent dans `web/public/assets/photos/`, et chaque sous-catégorie n'utilise
 que des visuels du bon type de produit (pools vérifiés lors du design).
 
-Base SQLite et fichiers déposés sous `server/data/` (hors dépôt).
+Les 329 photos du catalogue sont des fichiers statiques servis par le CDN. En
+revanche, les **preuves de virement et les photos ajoutées depuis le
+back-office sont stockées en base** (colonne `bytea` de la table `files`), pas
+sur disque : une fonction serverless n'a pas de système de fichiers persistant.
+Cela évite aussi d'ajouter un service de stockage objet. Si le volume de photos
+devient important, c'est le premier endroit à basculer vers Vercel Blob ou S3.
+
+Les preuves ne sont jamais servies publiquement : elles passent par une route
+admin authentifiée, avec `Cache-Control: private, no-store`.
 
 ## Points à trancher
 

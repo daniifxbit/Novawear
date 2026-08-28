@@ -1,7 +1,14 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import nodemailer, { type Transporter } from 'nodemailer'
-import { db, OUTBOX_DIR } from './db.js'
+import { exec } from './db.js'
+
+/**
+ * Where undelivered messages are written when no SMTP server is configured.
+ * Serverless instances have no writable project directory, so this is disabled
+ * there and the message is only recorded in the database.
+ */
+const OUTBOX_DIR = process.env.VERCEL ? null : path.resolve(process.cwd(), 'data/outbox')
 
 export const MAIL_FROM = process.env.MAIL_FROM ?? 'NOVAWEAR <no-reply@novawear.local>'
 export const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? ''
@@ -50,10 +57,13 @@ export interface Mail {
   orderRef?: string
 }
 
-function record(mail: Mail, status: 'sent' | 'written' | 'failed', detail: string) {
-  db.prepare(
-    'INSERT INTO emails (order_ref, recipient, subject, kind, status, detail, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
-  ).run(mail.orderRef ?? null, mail.to, mail.subject, mail.kind, status, detail, new Date().toISOString())
+async function record(mail: Mail, status: 'sent' | 'written' | 'failed', detail: string) {
+  await exec(
+    'INSERT INTO emails (order_ref, recipient, subject, kind, status, detail) VALUES ($1, $2, $3, $4, $5, $6)',
+    [mail.orderRef ?? null, mail.to, mail.subject, mail.kind, status, detail],
+  ).catch((err: unknown) => {
+    console.error('✉  Journalisation de l’email impossible :', err)
+  })
 }
 
 /**
@@ -73,18 +83,25 @@ export async function sendMail(mail: Mail): Promise<void> {
     })
 
     if (SMTP_CONFIGURED) {
-      record(mail, 'sent', String(info.messageId ?? ''))
+      await record(mail, 'sent', String(info.messageId ?? ''))
+      return
+    }
+
+    if (!OUTBOX_DIR) {
+      await record(mail, 'written', 'aucun SMTP configuré — message non envoyé')
+      console.warn(`✉  ${mail.kind} → ${mail.to} NON ENVOYÉ : aucun SMTP configuré.`)
       return
     }
 
     const stamp = new Date().toISOString().replace(/[:.]/g, '-')
     const file = path.join(OUTBOX_DIR, `${stamp}-${mail.kind}.eml`)
+    await fs.mkdir(OUTBOX_DIR, { recursive: true })
     await fs.writeFile(file, (info as { message: Buffer }).message)
-    record(mail, 'written', file)
+    await record(mail, 'written', file)
     console.log(`✉  ${mail.kind} → ${mail.to} (aucun SMTP configuré, écrit dans ${file})`)
   } catch (err) {
     const detail = err instanceof Error ? err.message : String(err)
-    record(mail, 'failed', detail)
+    await record(mail, 'failed', detail)
     console.error(`✉  Échec d'envoi (${mail.kind} → ${mail.to}) : ${detail}`)
   }
 }

@@ -1,4 +1,4 @@
-import { db } from './db.js'
+import { query, queryOne } from './db.js'
 import { CATEGORIES } from './catalogue.js'
 
 export interface ProductRow {
@@ -8,15 +8,17 @@ export interface ProductRow {
   cat_id: string
   sub_id: string
   price_cents: number
-  sizes: string
+  /** jsonb — the driver hands these back already parsed. */
+  sizes: string[]
   badge: string | null
   description: string
   image: string
-  pool: string
+  pool: string[]
   source: string
-  deleted: number
-  position: number
-  created_at: string
+  deleted: boolean
+  /** BIGINT — the driver returns it as a string; only used for ordering. */
+  sort_order: string
+  created_at: Date
 }
 
 export interface Product {
@@ -50,11 +52,11 @@ export function toProduct(row: ProductRow): Product {
     subId: row.sub_id,
     subLabel: subLabel(row.cat_id, row.sub_id),
     priceCents: row.price_cents,
-    sizes: JSON.parse(row.sizes),
+    sizes: row.sizes,
     badge: row.badge,
     description: row.description,
     image: row.image,
-    pool: JSON.parse(row.pool),
+    pool: row.pool,
     source: row.source === 'admin' ? 'admin' : 'seed',
   }
 }
@@ -62,17 +64,15 @@ export function toProduct(row: ProductRow): Product {
 /**
  * Live catalogue, ordered exactly as the design does: articles added by the
  * admin first (newest first), then the seeded catalogue in generation order.
- * Admin rows carry a negative position for that reason.
+ * Admin rows carry a negative sort_order for that reason.
  */
-export function listProducts(): Product[] {
-  const rows = db
-    .prepare('SELECT * FROM products WHERE deleted = 0 ORDER BY position ASC')
-    .all() as ProductRow[]
+export async function listProducts(): Promise<Product[]> {
+  const rows = await query<ProductRow>('SELECT * FROM products WHERE deleted = FALSE ORDER BY sort_order ASC')
   return rows.map(toProduct)
 }
 
-export function findProduct(id: string): Product | null {
-  const row = db.prepare('SELECT * FROM products WHERE id = ? AND deleted = 0').get(id) as ProductRow | undefined
+export async function findProduct(id: string): Promise<Product | null> {
+  const row = await queryOne<ProductRow>('SELECT * FROM products WHERE id = $1 AND deleted = FALSE', [id])
   return row ? toProduct(row) : null
 }
 

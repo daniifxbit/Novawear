@@ -1,66 +1,65 @@
 import { pathToFileURL } from 'node:url'
-import { db, setSetting, getSetting, BANK_DEFAULT, type BankInfo } from './db.js'
+import { BANK_DEFAULT, ensureSchema, getSetting, pool, query, setSetting, withTransaction, type BankInfo } from './db.js'
 import { buildCatalogue } from './catalogue.js'
 
 /**
- * Seeds the 329 catalogue articles.
+ * Creates the schema and seeds the 329 catalogue articles.
  *
- * Insert-only by default, and it runs on every boot: once the shop owner has
- * edited names and prices, that data is theirs, so an existing row is never
- * touched. `force` refreshes seeded rows back to the generated catalogue —
- * it discards those edits, so it is reserved for `npm run seed:reset`.
+ * Insert-only by default: once the shop owner has edited names and prices,
+ * that data is theirs, so an existing row is never touched. `force` refreshes
+ * seeded rows back to the generated catalogue — it discards those edits, so it
+ * is reserved for `npm run seed:reset`.
  */
-export function seed(options: { force?: boolean } = {}): { inserted: number; updated: number } {
+export async function seed(options: { force?: boolean } = {}): Promise<{ inserted: number; updated: number }> {
+  await ensureSchema()
+
   const products = buildCatalogue()
-  const now = new Date().toISOString()
-
   const existing = new Set(
-    (db.prepare("SELECT id FROM products WHERE source = 'seed'").all() as { id: string }[]).map((r) => r.id),
+    (await query<{ id: string }>("SELECT id FROM products WHERE source = 'seed'")).map((r) => r.id),
   )
-
-  const insert = db.prepare(`
-    INSERT INTO products (id, ref, name, cat_id, sub_id, price_cents, sizes, badge, description, image, pool, source, deleted, position, created_at)
-    VALUES (@id, @ref, @name, @catId, @subId, @priceCents, @sizes, @badge, @description, @image, @pool, 'seed', 0, @position, @createdAt)
-  `)
-  const update = db.prepare(`
-    UPDATE products SET
-      ref = @ref, name = @name, cat_id = @catId, sub_id = @subId, price_cents = @priceCents,
-      sizes = @sizes, badge = @badge, description = @description, image = @image, pool = @pool, position = @position
-    WHERE id = @id AND source = 'seed'
-  `)
 
   let inserted = 0
   let updated = 0
 
-  db.transaction(() => {
+  await withTransaction(async (client) => {
     for (const p of products) {
-      const row = {
-        id: p.id,
-        ref: p.ref,
-        name: p.name,
-        catId: p.catId,
-        subId: p.subId,
-        priceCents: p.priceCents,
-        sizes: JSON.stringify(p.sizes),
-        badge: p.badge,
-        description: p.description,
-        image: p.image,
-        pool: JSON.stringify(p.pool),
-        position: p.position,
-        createdAt: now,
-      }
+      const values = [
+        p.id,
+        p.ref,
+        p.name,
+        p.catId,
+        p.subId,
+        p.priceCents,
+        JSON.stringify(p.sizes),
+        p.badge,
+        p.description,
+        p.image,
+        JSON.stringify(p.pool),
+        p.position,
+      ]
+
       if (!existing.has(p.id)) {
-        insert.run(row)
+        await client.query(
+          `INSERT INTO products (id, ref, name, cat_id, sub_id, price_cents, sizes, badge, description, image, pool, sort_order, source, deleted)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'seed', FALSE)`,
+          values,
+        )
         inserted++
       } else if (options.force) {
-        update.run(row)
+        await client.query(
+          `UPDATE products SET
+             ref = $2, name = $3, cat_id = $4, sub_id = $5, price_cents = $6, sizes = $7,
+             badge = $8, description = $9, image = $10, pool = $11, sort_order = $12
+           WHERE id = $1 AND source = 'seed'`,
+          values,
+        )
         updated++
       }
     }
+  })
 
-    if (!getSetting<BankInfo | null>('bank', null)) setSetting('bank', BANK_DEFAULT)
-    if (getSetting<number | null>('chf_rate', null) === null) setSetting('chf_rate', 0.94)
-  })()
+  if (!(await getSetting<BankInfo | null>('bank', null))) await setSetting('bank', BANK_DEFAULT)
+  if ((await getSetting<number | null>('chf_rate', null)) === null) await setSetting('chf_rate', 0.94)
 
   return { inserted, updated }
 }
@@ -74,7 +73,11 @@ if (runAsScript) {
     console.warn('   Toute modification faite depuis le back-office sur ces articles sera perdue.')
   }
 
-  const { inserted, updated } = seed({ force })
-  const total = db.prepare('SELECT COUNT(*) AS n FROM products').get() as { n: number }
-  console.log(`Catalogue — ${inserted} ajoutés, ${updated} réinitialisés, ${total.n} articles en base.`)
+  try {
+    const { inserted, updated } = await seed({ force })
+    const [{ count }] = await query<{ count: string }>('SELECT COUNT(*) AS count FROM products')
+    console.log(`Catalogue — ${inserted} ajoutés, ${updated} réinitialisés, ${count} articles en base.`)
+  } finally {
+    await pool.end()
+  }
 }

@@ -3,7 +3,7 @@ dist/
 .env
 .env.local
 
-# SQLite database and uploaded files (receipts, product photos)
+# Local outbox for emails when no SMTP server is configured
 server/data/
 
 *.log
