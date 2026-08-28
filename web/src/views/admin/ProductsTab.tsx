@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { api } from '../../api'
+import { ApiError, api, type RowError } from '../../api'
 import { eur } from '../../format'
 import { useShop } from '../../shop'
 import type { AdminProductsResponse } from '../../types'
+import { EditArticleRow } from './EditArticleRow'
 
 const BADGES: [string, string][] = [
   ['', 'Aucun'],
@@ -38,6 +39,9 @@ export function ProductsTab() {
   const [error, setError] = useState('')
   const [query, setQuery] = useState('')
   const [data, setData] = useState<AdminProductsResponse | null>(null)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [importMsg, setImportMsg] = useState('')
+  const [importErrors, setImportErrors] = useState<RowError[]>([])
 
   const load = useCallback(async (term: string) => {
     try {
@@ -115,8 +119,64 @@ export function ProductsTab() {
     }
   }
 
+  async function importCsv(file: File) {
+    setImportMsg('')
+    setImportErrors([])
+    try {
+      const result = await api.admin.importProducts(file)
+      setImportMsg(
+        `${result.updated} article(s) mis à jour, ${result.unchanged} inchangé(s) sur ${result.rows} ligne(s).`,
+      )
+      reloadCatalog()
+      await load(query)
+    } catch (err) {
+      setImportMsg('')
+      setError(err instanceof Error ? err.message : 'Import impossible')
+      if (err instanceof ApiError) setImportErrors(err.rowErrors)
+    }
+  }
+
   return (
     <div className="admin-two-col">
+      <div className="admin-col">
+      <div className="admin-panel">
+        <span className="admin-panel__title">Catalogue en tableur</span>
+        <span className="admin-panel__hint">
+          Exporte les {data?.totalCount ?? 0} articles, corrige les noms, prix, tailles et badges dans ton tableur,
+          puis réimporte le fichier. La colonne « id » identifie chaque article : ne la modifie pas.
+        </span>
+        <a className="admin-panel__submit admin-panel__submit--link" href={api.admin.exportUrl} download>
+          Exporter le catalogue (CSV)
+        </a>
+        <label className="field">
+          <span className="field__label">Réimporter un fichier</span>
+          <input
+            className="file-input"
+            type="file"
+            accept=".csv,text/csv"
+            onChange={(e) => {
+              const file = e.target.files?.[0]
+              e.target.value = ''
+              if (file) void importCsv(file)
+            }}
+          />
+        </label>
+        {importMsg && <span className="admin-panel__msg">{importMsg}</span>}
+        {importErrors.length > 0 && (
+          <ul className="import-errors">
+            {importErrors.map((rowError) => (
+              <li key={rowError.line}>
+                Ligne {rowError.line} — {rowError.message}
+              </li>
+            ))}
+          </ul>
+        )}
+        <span className="admin-panel__hint">
+          Un fichier contenant la moindre erreur n'est pas appliqué du tout : corrige les lignes signalées et
+          réimporte.
+        </span>
+      </div>
+
       <div className="admin-panel">
         <span className="admin-panel__title">Ajouter un article</span>
 
@@ -223,6 +283,7 @@ export function ProductsTab() {
         {message && <span className="admin-panel__msg">{message}</span>}
         {error && <span className="form-error">{error}</span>}
       </div>
+      </div>
 
       <div className="admin-list">
         <div className="admin-list__head">
@@ -246,21 +307,38 @@ export function ProductsTab() {
         </div>
 
         <div className="admin-list__rows">
-          {(data?.products ?? []).map((p) => (
-            <div className="admin-row" key={p.id}>
-              <img src={p.image} alt={p.name} loading="lazy" />
-              <div className="admin-row__body">
-                <span className="admin-row__name">{p.name}</span>
-                <span className="admin-row__meta">
-                  {p.ref} · {p.catLabel} · {p.subLabel}
-                </span>
+          {(data?.products ?? []).map((p) =>
+            editingId === p.id ? (
+              <EditArticleRow
+                key={p.id}
+                product={p}
+                categories={categories}
+                onCancel={() => setEditingId(null)}
+                onSaved={() => {
+                  setEditingId(null)
+                  reloadCatalog()
+                  void load(query)
+                }}
+              />
+            ) : (
+              <div className="admin-row" key={p.id}>
+                <img src={p.image} alt={p.name} loading="lazy" />
+                <div className="admin-row__body">
+                  <span className="admin-row__name">{p.name}</span>
+                  <span className="admin-row__meta">
+                    {p.ref} · {p.catLabel} · {p.subLabel}
+                  </span>
+                </div>
+                <span className="admin-row__price">{eur(p.priceCents)}</span>
+                <button className="admin-row__delete" onClick={() => setEditingId(p.id)}>
+                  Modifier
+                </button>
+                <button className="admin-row__delete" onClick={() => void remove(p.id)}>
+                  Supprimer
+                </button>
               </div>
-              <span className="admin-row__price">{eur(p.priceCents)}</span>
-              <button className="admin-row__delete" onClick={() => void remove(p.id)}>
-                Supprimer
-              </button>
-            </div>
-          ))}
+            ),
+          )}
         </div>
       </div>
     </div>

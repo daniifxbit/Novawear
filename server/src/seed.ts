@@ -3,11 +3,14 @@ import { db, setSetting, getSetting, BANK_DEFAULT, type BankInfo } from './db.js
 import { buildCatalogue } from './catalogue.js'
 
 /**
- * Seeds the 329 catalogue articles. Re-running is safe: seeded rows are
- * refreshed in place, so a soft-deleted article stays deleted and articles
- * added by the admin are never touched.
+ * Seeds the 329 catalogue articles.
+ *
+ * Insert-only by default, and it runs on every boot: once the shop owner has
+ * edited names and prices, that data is theirs, so an existing row is never
+ * touched. `force` refreshes seeded rows back to the generated catalogue —
+ * it discards those edits, so it is reserved for `npm run seed:reset`.
  */
-export function seed(): { inserted: number; updated: number } {
+export function seed(options: { force?: boolean } = {}): { inserted: number; updated: number } {
   const products = buildCatalogue()
   const now = new Date().toISOString()
 
@@ -46,12 +49,12 @@ export function seed(): { inserted: number; updated: number } {
         position: p.position,
         createdAt: now,
       }
-      if (existing.has(p.id)) {
-        update.run(row)
-        updated++
-      } else {
+      if (!existing.has(p.id)) {
         insert.run(row)
         inserted++
+      } else if (options.force) {
+        update.run(row)
+        updated++
       }
     }
 
@@ -65,7 +68,13 @@ export function seed(): { inserted: number; updated: number } {
 const runAsScript = process.argv[1] ? import.meta.url === pathToFileURL(process.argv[1]).href : false
 
 if (runAsScript) {
-  const { inserted, updated } = seed()
+  const force = process.argv.includes('--force')
+  if (force) {
+    console.warn('⚠  --force : les articles du catalogue d’origine repassent aux valeurs générées.')
+    console.warn('   Toute modification faite depuis le back-office sur ces articles sera perdue.')
+  }
+
+  const { inserted, updated } = seed({ force })
   const total = db.prepare('SELECT COUNT(*) AS n FROM products').get() as { n: number }
-  console.log(`Catalogue seeded — ${inserted} ajoutés, ${updated} mis à jour, ${total.n} articles en base.`)
+  console.log(`Catalogue — ${inserted} ajoutés, ${updated} réinitialisés, ${total.n} articles en base.`)
 }

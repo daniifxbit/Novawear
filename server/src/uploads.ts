@@ -51,6 +51,22 @@ export const productImageUpload = multer({
   fileFilter: accept(['image/jpeg', 'image/png', 'image/webp']),
 })
 
+/** Catalogue import: kept in memory, parsed and discarded. */
+export const csvUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 2 * 1024 * 1024, files: 1 },
+  fileFilter: (_req, file, cb) => {
+    const looksLikeCsv =
+      file.originalname.toLowerCase().endsWith('.csv') ||
+      ['text/csv', 'application/csv', 'text/plain', 'application/vnd.ms-excel'].includes(file.mimetype)
+    if (!looksLikeCsv) {
+      cb(new Error('Format de fichier non accepté'))
+      return
+    }
+    cb(null, true)
+  },
+})
+
 export const proofPath = (filename: string) => path.join(PROOF_DIR, filename)
 export const productImagePath = (filename: string) => path.join(PRODUCT_IMG_DIR, filename)
 

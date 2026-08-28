@@ -26,6 +26,11 @@ npm run dev      # API sur :4000, front sur :5173 (proxy /api → :4000)
 
 Le catalogue est semé automatiquement au premier démarrage (329 articles).
 
+Le semis tourne à chaque démarrage mais **n'insère que les articles manquants** :
+les modifications faites depuis le back-office ne sont jamais écrasées.
+`npm run seed:reset` force le retour aux valeurs générées — et détruit donc ces
+modifications.
+
 ### Production
 
 ```bash
@@ -97,9 +102,17 @@ Lien « Admin » discret en pied de page, protégé par `ADMIN_CODE`.
 - **Commandes** — compteurs, détail, preuve de paiement en grand, validation ou
   rejet avec motif obligatoire, remise en attente, pilotage des 5 étapes de
   livraison.
-- **Articles** — ajout (nom, catégorie, sous-catégorie, prix, tailles, badge,
-  photo) et suppression. Les articles du catalogue d'origine sont masqués et
-  restaurables en bloc ; ceux ajoutés depuis l'admin sont supprimés définitivement.
+- **Articles** — ajout, modification en place (nom, référence, prix, tailles,
+  badge, catégorie, sous-catégorie, photo) et suppression. Les articles du
+  catalogue d'origine sont masqués et restaurables en bloc ; ceux ajoutés depuis
+  l'admin sont supprimés définitivement.
+- **Catalogue en tableur** — export CSV des articles en ligne, réimport pour
+  mettre à jour en masse. Le fichier est encodé en UTF-8 avec BOM et séparé par
+  des points-virgules : Excel français l'ouvre en colonnes sans assistant. La
+  colonne `id` fait la correspondance ; `categorie` et `sous_categorie`
+  acceptent l'identifiant (`ts`, `graph`) ou le libellé (`T-SHIRTS`,
+  `Graphiques`). **Un fichier contenant la moindre erreur n'est pas appliqué du
+  tout** — la réponse liste les lignes fautives.
 - **Coordonnées bancaires** — titulaire, IBAN, BIC, banque, avec aperçu client en
   direct. Reprises automatiquement à l'étape de paiement.
 
@@ -121,8 +134,11 @@ Lien « Admin » discret en pied de page, protégé par `ADMIN_CODE`.
 | GET/PUT | `/api/admin/bank`                  | admin  |
 | GET     | `/api/admin/products`              | admin  |
 | POST    | `/api/admin/products`              | admin  |
+| PATCH   | `/api/admin/products/:id`          | admin  |
 | DELETE  | `/api/admin/products/:id`          | admin  |
 | POST    | `/api/admin/products/restore`      | admin  |
+| GET     | `/api/admin/products/export.csv`   | admin  |
+| POST    | `/api/admin/products/import`       | admin  |
 
 Les preuves de paiement ne sont jamais servies publiquement : elles passent par
 une route admin authentifiée. Le suivi public ne renvoie ni nom, ni adresse, ni

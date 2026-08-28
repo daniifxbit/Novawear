@@ -12,7 +12,8 @@ import {
   type ProductRow,
 } from '../shop.js'
 import { IS_DEMO_CODE, checkCode, cookieName, isAuthenticated, issueSession, requireAdmin } from '../auth.js'
-import { productImagePath, productImageUpload, productImageUrl, proofPath } from '../uploads.js'
+import { csvUpload, productImagePath, productImageUpload, productImageUrl, proofPath } from '../uploads.js'
+import { parseCsv, toCsv } from '../csv.js'
 import { orderMailData } from '../orderMail.js'
 import { orderRejectedMail, orderStageMail, orderValidatedMail } from '../emails.js'
 import { queueMail } from '../mailer.js'
@@ -325,6 +326,297 @@ adminRouter.post('/products', productImageUpload.single('photo'), (req, res) => 
 
   const row = db.prepare('SELECT * FROM products WHERE id = ?').get(id) as ProductRow
   res.status(201).json({ product: toProduct(row) })
+})
+
+export const BADGES = ['NOUVEAU', 'DERNIÈRES PIÈCES', 'EXCLU'] as const
+
+type Taxonomy =
+  | { ok: false; error: string }
+  | { ok: true; category: (typeof CATEGORIES)[number]; subCategory: (typeof CATEGORIES)[number]['subs'][number] }
+
+/** Resolves a category/subcategory from either its id or its printed label. */
+function resolveTaxonomy(catValue: string, subValue: string): Taxonomy {
+  const key = catValue.trim().toLowerCase()
+  const category =
+    CATEGORIES.find((c) => c.id.toLowerCase() === key) ??
+    CATEGORIES.find((c) => c.label.toLowerCase() === key)
+  if (!category) return { ok: false, error: `Catégorie inconnue : « ${catValue} »` }
+
+  const subKey = subValue.trim().toLowerCase()
+  const subCategory =
+    category.subs.find((s) => s.id.toLowerCase() === subKey) ??
+    category.subs.find((s) => s.label.toLowerCase() === subKey)
+  if (!subCategory) {
+    return { ok: false, error: `Sous-catégorie inconnue pour ${category.label} : « ${subValue} »` }
+  }
+
+  return { ok: true, category, subCategory }
+}
+
+const parsePrice = (value: string) => Number.parseFloat(value.replace(',', '.').replace(/[^\d.-]/g, ''))
+const parseSizes = (value: string) =>
+  value
+    .split('/')
+    .map((s) => s.trim())
+    .filter(Boolean)
+
+adminRouter.patch('/products/:id', productImageUpload.single('photo'), (req, res) => {
+  const row = db.prepare('SELECT * FROM products WHERE id = ? AND deleted = 0').get(req.params.id) as
+    | ProductRow
+    | undefined
+  if (!row) {
+    res.status(404).json({ error: 'Article introuvable' })
+    return
+  }
+
+  const body = req.body as Record<string, string | undefined>
+  const patch: Record<string, string | number | null> = {}
+
+  if (body.name !== undefined) {
+    const name = body.name.trim()
+    if (!name) {
+      res.status(400).json({ error: 'Le nom ne peut pas être vide' })
+      return
+    }
+    patch.name = name.toUpperCase()
+  }
+
+  if (body.ref !== undefined) {
+    const ref = body.ref.trim()
+    if (!ref) {
+      res.status(400).json({ error: 'La référence ne peut pas être vide' })
+      return
+    }
+    patch.ref = ref.toUpperCase()
+  }
+
+  if (body.price !== undefined) {
+    const price = parsePrice(body.price)
+    if (!Number.isFinite(price) || price <= 0) {
+      res.status(400).json({ error: 'Prix invalide' })
+      return
+    }
+    patch.price_cents = Math.round(price * 100)
+  }
+
+  if (body.sizes !== undefined) {
+    const sizes = parseSizes(body.sizes)
+    if (sizes.length === 0) {
+      res.status(400).json({ error: 'Indique au moins une taille' })
+      return
+    }
+    patch.sizes = JSON.stringify(sizes)
+  }
+
+  if (body.badge !== undefined) {
+    const badge = body.badge.trim().toUpperCase()
+    if (badge && !BADGES.includes(badge as (typeof BADGES)[number])) {
+      res.status(400).json({ error: `Badge inconnu : « ${body.badge} »` })
+      return
+    }
+    patch.badge = badge || null
+  }
+
+  if (body.cat !== undefined || body.sub !== undefined) {
+    const resolved = resolveTaxonomy(body.cat ?? row.cat_id, body.sub ?? row.sub_id)
+    if (!resolved.ok) {
+      res.status(400).json({ error: resolved.error })
+      return
+    }
+    patch.cat_id = resolved.category.id
+    patch.sub_id = resolved.subCategory.id
+    // The blurb follows the category it was written for.
+    if (resolved.category.id !== row.cat_id) patch.description = DESCRIPTIONS[resolved.category.id]
+  }
+
+  if (req.file) {
+    const image = productImageUrl(req.file.filename)
+    patch.image = image
+    patch.pool = JSON.stringify([image])
+
+    const previous = row.image.startsWith('/api/media/products/') ? row.image.split('/').pop() : null
+    if (previous) fs.rm(productImagePath(previous), { force: true }, () => {})
+  }
+
+  if (Object.keys(patch).length === 0) {
+    res.status(400).json({ error: 'Aucune modification' })
+    return
+  }
+
+  const assignments = Object.keys(patch)
+    .map((column) => `${column} = @${column}`)
+    .join(', ')
+  db.prepare(`UPDATE products SET ${assignments} WHERE id = @id`).run({ ...patch, id: row.id })
+
+  const updated = db.prepare('SELECT * FROM products WHERE id = ?').get(row.id) as ProductRow
+  res.json({ product: toProduct(updated) })
+})
+
+const CSV_HEAD = ['id', 'ref', 'nom', 'prix_eur', 'tailles', 'badge', 'categorie', 'sous_categorie']
+
+adminRouter.get('/products/export.csv', (_req, res) => {
+  const rows = listProducts().map((p) => [
+    p.id,
+    p.ref,
+    p.name,
+    (p.priceCents / 100).toFixed(2).replace('.', ','),
+    p.sizes.join(' / '),
+    p.badge ?? '',
+    p.catId,
+    p.subId,
+  ])
+
+  res.type('text/csv; charset=utf-8')
+  res.setHeader('Content-Disposition', `attachment; filename="novawear-catalogue-${new Date().toISOString().slice(0, 10)}.csv"`)
+  res.send(toCsv(CSV_HEAD, rows))
+})
+
+adminRouter.post('/products/import', csvUpload.single('file'), (req, res) => {
+  if (!req.file) {
+    res.status(400).json({ error: 'Joins un fichier CSV' })
+    return
+  }
+
+  const rows = parseCsv(req.file.buffer.toString('utf8'))
+  if (rows.length < 2) {
+    res.status(400).json({ error: 'Le fichier est vide ou ne contient que l’en-tête' })
+    return
+  }
+
+  const header = rows[0].map((cell) => cell.trim().toLowerCase())
+  const column = (name: string) => header.indexOf(name)
+  const idAt = column('id')
+  const refAt = column('ref')
+
+  if (idAt === -1 && refAt === -1) {
+    res.status(400).json({ error: 'Le fichier doit contenir une colonne « id » ou « ref »' })
+    return
+  }
+
+  const at = {
+    name: column('nom'),
+    price: column('prix_eur'),
+    sizes: column('tailles'),
+    badge: column('badge'),
+    cat: column('categorie'),
+    sub: column('sous_categorie'),
+  }
+
+  const errors: { line: number; message: string }[] = []
+  let updated = 0
+  let unchanged = 0
+
+  const findRow = (id: string, ref: string): ProductRow | undefined => {
+    if (id) {
+      const byId = db.prepare('SELECT * FROM products WHERE id = ? AND deleted = 0').get(id) as ProductRow | undefined
+      if (byId) return byId
+    }
+    if (ref) {
+      return db.prepare('SELECT * FROM products WHERE ref = ? AND deleted = 0').get(ref) as ProductRow | undefined
+    }
+    return undefined
+  }
+
+  // One transaction: a file with bad rows updates nothing, so the admin can
+  // fix the spreadsheet and retry against a known state.
+  const apply = db.transaction(() => {
+    for (let i = 1; i < rows.length; i++) {
+      const line = i + 1
+      const cells = rows[i]
+      const cell = (index: number) => (index >= 0 ? (cells[index] ?? '').trim() : '')
+
+      const id = cell(idAt)
+      const ref = cell(refAt)
+      const row = findRow(id, ref)
+      if (!row) {
+        errors.push({ line, message: `Aucun article ne correspond à « ${id || ref} »` })
+        continue
+      }
+
+      const patch: Record<string, string | number | null> = {}
+
+      const name = cell(at.name)
+      if (at.name >= 0) {
+        if (!name) {
+          errors.push({ line, message: 'Nom vide' })
+          continue
+        }
+        patch.name = name.toUpperCase()
+      }
+
+      if (at.price >= 0) {
+        const price = parsePrice(cell(at.price))
+        if (!Number.isFinite(price) || price <= 0) {
+          errors.push({ line, message: `Prix invalide : « ${cell(at.price)} »` })
+          continue
+        }
+        patch.price_cents = Math.round(price * 100)
+      }
+
+      if (at.sizes >= 0) {
+        const sizes = parseSizes(cell(at.sizes))
+        if (sizes.length === 0) {
+          errors.push({ line, message: 'Aucune taille' })
+          continue
+        }
+        patch.sizes = JSON.stringify(sizes)
+      }
+
+      if (at.badge >= 0) {
+        const badge = cell(at.badge).toUpperCase()
+        if (badge && !BADGES.includes(badge as (typeof BADGES)[number])) {
+          errors.push({ line, message: `Badge inconnu : « ${cell(at.badge)} »` })
+          continue
+        }
+        patch.badge = badge || null
+      }
+
+      if (at.cat >= 0 || at.sub >= 0) {
+        const resolved = resolveTaxonomy(at.cat >= 0 ? cell(at.cat) : row.cat_id, at.sub >= 0 ? cell(at.sub) : row.sub_id)
+        if (!resolved.ok) {
+          errors.push({ line, message: resolved.error })
+          continue
+        }
+        patch.cat_id = resolved.category.id
+        patch.sub_id = resolved.subCategory.id
+        if (resolved.category.id !== row.cat_id) patch.description = DESCRIPTIONS[resolved.category.id]
+      }
+
+      if (refAt >= 0 && ref && ref.toUpperCase() !== row.ref) patch.ref = ref.toUpperCase()
+
+      // Drop columns whose value already matches, so re-importing an untouched
+      // export reports "unchanged" instead of claiming 329 updates.
+      for (const key of Object.keys(patch)) {
+        if (patch[key] === (row as unknown as Record<string, unknown>)[key]) delete patch[key]
+      }
+
+      if (Object.keys(patch).length === 0) {
+        unchanged++
+        continue
+      }
+
+      const assignments = Object.keys(patch)
+        .map((col) => `${col} = @${col}`)
+        .join(', ')
+      db.prepare(`UPDATE products SET ${assignments} WHERE id = @id`).run({ ...patch, id: row.id })
+      updated++
+    }
+
+    if (errors.length > 0) throw new Error('rollback')
+  })
+
+  try {
+    apply()
+  } catch {
+    res.status(400).json({
+      error: `${errors.length} ligne(s) en erreur — aucune modification appliquée`,
+      errors: errors.slice(0, 20),
+      errorCount: errors.length,
+    })
+    return
+  }
+
+  res.json({ updated, unchanged, rows: rows.length - 1 })
 })
 
 adminRouter.delete('/products/:id', (req, res) => {
