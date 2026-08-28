@@ -44,19 +44,24 @@ depuis le CDN, et **toute l'API passe par une seule fonction serverless**
 fait le routage.
 
 1. **Créer la base.** Onglet Storage du projet Vercel → Postgres (Neon), ou un
-   compte Neon séparé. Récupérer la chaîne de connexion **« pooled »** : en
-   serverless, chaque invocation ouvre sa propre connexion, et la chaîne directe
-   épuiserait la base.
+   projet Supabase. Récupérer la chaîne de connexion **passant par le pooler** :
+   en serverless chaque invocation ouvre sa propre connexion, et la connexion
+   directe épuiserait la base.
 2. **Renseigner les variables** dans Settings → Environment Variables, pour
    *Production*, *Preview* **et *Build*** — la migration tourne pendant le build :
 
    | Variable         | Rôle                                                     |
    | ---------------- | -------------------------------------------------------- |
-   | `DATABASE_URL`   | chaîne de connexion pooled (obligatoire)                  |
+   | `DATABASE_URL`   | connexion Postgres **via pooler** (obligatoire)           |
    | `SESSION_SECRET` | signe les sessions admin (obligatoire, voir plus bas)     |
-   | `ADMIN_CODE`     | code d'accès au back-office                               |
-   | `PUBLIC_URL`     | `https://<ton-domaine>` — base des liens dans les emails  |
+   | `ADMIN_CODE`     | code d'accès au back-office (sinon `NOVA` reste actif)    |
+   | `PUBLIC_URL`     | seulement pour un domaine personnalisé — sinon déduit de Vercel |
    | `SMTP_*`, `MAIL_FROM`, `ADMIN_EMAIL` | envoi des emails (voir `.env.example`) |
+
+   La base peut venir de Vercel Postgres (Neon) **ou de Supabase** : c'est du
+   PostgreSQL dans les deux cas, seule la chaîne de connexion change. Avec
+   Supabase, prendre celle du **Transaction pooler** (port 6543), pas la
+   connexion directe.
 
 3. **Déployer.** Le build enchaîne : compilation du serveur → migration et semis
    du catalogue → build du front.

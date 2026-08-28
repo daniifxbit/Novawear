@@ -12,7 +12,18 @@ const OUTBOX_DIR = process.env.VERCEL ? null : path.resolve(process.cwd(), 'data
 
 export const MAIL_FROM = process.env.MAIL_FROM ?? 'NOVAWEAR <no-reply@novawear.local>'
 export const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? ''
-export const PUBLIC_URL = (process.env.PUBLIC_URL ?? 'http://localhost:4000').replace(/\/+$/, '')
+/**
+ * Base for the links inside emails. Vercel already knows the deployment's own
+ * hostname, so PUBLIC_URL only needs setting for a custom domain.
+ */
+function resolvePublicUrl(): string {
+  if (process.env.PUBLIC_URL) return process.env.PUBLIC_URL
+  const vercelHost = process.env.VERCEL_PROJECT_PRODUCTION_URL ?? process.env.VERCEL_URL
+  if (vercelHost) return `https://${vercelHost}`
+  return 'http://localhost:4000'
+}
+
+export const PUBLIC_URL = resolvePublicUrl().replace(/\/+$/, '')
 
 /** Link that opens the tracking page with the reference already filled in. */
 export const trackingUrl = (ref: string) => `${PUBLIC_URL}/?suivi=${encodeURIComponent(ref)}`
