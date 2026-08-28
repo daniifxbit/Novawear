@@ -1,25 +1,19 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { api } from '../api'
 import { dateTime, eur } from '../format'
 import { useShop } from '../shop'
 import type { TrackedOrder } from '../types'
 
-export function TrackView() {
+export function TrackView({ initialRef }: { initialRef?: string }) {
   const { catalog } = useShop()
   const stages = catalog?.stages ?? []
 
-  const [input, setInput] = useState('')
+  const [input, setInput] = useState(initialRef ?? '')
   const [order, setOrder] = useState<TrackedOrder | null>(null)
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
 
-  async function lookup() {
-    const ref = input.trim()
-    if (!ref) {
-      setError('Saisis ta référence de commande')
-      setOrder(null)
-      return
-    }
+  const lookupRef = useCallback(async (ref: string) => {
     setBusy(true)
     try {
       setOrder(await api.track(ref))
@@ -30,6 +24,25 @@ export function TrackView() {
     } finally {
       setBusy(false)
     }
+  }, [])
+
+  // A reference arriving from an email link resolves straight away.
+  const autoLookedUp = useRef(false)
+  useEffect(() => {
+    if (initialRef && !autoLookedUp.current) {
+      autoLookedUp.current = true
+      void lookupRef(initialRef.trim())
+    }
+  }, [initialRef, lookupRef])
+
+  async function lookup() {
+    const ref = input.trim()
+    if (!ref) {
+      setError('Saisis ta référence de commande')
+      setOrder(null)
+      return
+    }
+    await lookupRef(ref)
   }
 
   const stage = order ? Math.min(order.stage, Math.max(stages.length - 1, 0)) : 0

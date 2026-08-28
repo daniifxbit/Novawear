@@ -37,7 +37,7 @@ function CurrentView() {
     case 'done':
       return <DoneView reference={view.ref} />
     case 'track':
-      return <TrackView />
+      return <TrackView initialRef={view.ref} />
     case 'admin':
       return <AdminView />
   }

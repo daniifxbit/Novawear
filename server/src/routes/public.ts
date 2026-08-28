@@ -12,6 +12,9 @@ import {
   shippingCents,
 } from '../shop.js'
 import { proofUpload } from '../uploads.js'
+import { orderMailData } from '../orderMail.js'
+import { adminNewOrderMail, orderDeclaredMail } from '../emails.js'
+import { ADMIN_EMAIL, queueMail } from '../mailer.js'
 
 export const publicRouter = Router()
 
@@ -173,6 +176,12 @@ publicRouter.post('/checkout/:id/confirm', proofUpload.single('proof'), (req, re
     UPDATE orders SET status = 'pending', proof_file = ?, proof_mime = ?, proof_name = ?, updated_at = ?
     WHERE id = ?
   `).run(req.file.filename, req.file.mimetype, req.file.originalname, new Date().toISOString(), row.id)
+
+  const order = orderMailData(row.id)
+  if (order) {
+    queueMail(orderDeclaredMail(order, getSetting<BankInfo>('bank', BANK_DEFAULT)))
+    if (ADMIN_EMAIL) queueMail(adminNewOrderMail(order, ADMIN_EMAIL))
+  }
 
   res.json({ ref: row.ref })
 })

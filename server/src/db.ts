@@ -9,8 +9,10 @@ export const DATA_DIR = process.env.DATA_DIR
 export const UPLOAD_DIR = path.join(DATA_DIR, 'uploads')
 export const PROOF_DIR = path.join(UPLOAD_DIR, 'proofs')
 export const PRODUCT_IMG_DIR = path.join(UPLOAD_DIR, 'products')
+/** Where messages are written when no SMTP server is configured. */
+export const OUTBOX_DIR = path.join(DATA_DIR, 'outbox')
 
-for (const dir of [DATA_DIR, UPLOAD_DIR, PROOF_DIR, PRODUCT_IMG_DIR]) {
+for (const dir of [DATA_DIR, UPLOAD_DIR, PROOF_DIR, PRODUCT_IMG_DIR, OUTBOX_DIR]) {
   fs.mkdirSync(dir, { recursive: true })
 }
 
@@ -69,6 +71,19 @@ db.exec(`
     key   TEXT PRIMARY KEY,
     value TEXT NOT NULL
   );
+
+  CREATE TABLE IF NOT EXISTS emails (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_ref  TEXT,
+    recipient  TEXT NOT NULL,
+    subject    TEXT NOT NULL,
+    kind       TEXT NOT NULL,
+    status     TEXT NOT NULL,        -- 'sent' | 'written' | 'failed'
+    detail     TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_emails_order ON emails (order_ref, created_at);
 `)
 
 export function getSetting<T>(key: string, fallback: T): T {

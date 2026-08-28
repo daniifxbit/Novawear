@@ -8,6 +8,7 @@ import { seed } from './seed.js'
 import { publicRouter } from './routes/public.js'
 import { adminRouter } from './routes/admin.js'
 import { IS_DEMO_CODE } from './auth.js'
+import { mailIsLive } from './mailer.js'
 
 const PORT = Number(process.env.PORT ?? 4000)
 const WEB_DIST = path.resolve(process.cwd(), '../web/dist')
@@ -67,6 +68,9 @@ if (IS_DEMO_CODE) {
 }
 if (!process.env.SESSION_SECRET) {
   console.warn('⚠  SESSION_SECRET non défini : les sessions admin seront invalidées à chaque redémarrage.')
+}
+if (!mailIsLive) {
+  console.warn('⚠  Aucun SMTP configuré : les emails sont écrits dans data/outbox au lieu d’être envoyés.')
 }
 
 app.listen(PORT, () => {

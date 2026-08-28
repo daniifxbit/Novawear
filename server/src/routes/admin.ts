@@ -13,6 +13,9 @@ import {
 } from '../shop.js'
 import { IS_DEMO_CODE, checkCode, cookieName, isAuthenticated, issueSession, requireAdmin } from '../auth.js'
 import { productImagePath, productImageUpload, productImageUrl, proofPath } from '../uploads.js'
+import { orderMailData } from '../orderMail.js'
+import { orderRejectedMail, orderStageMail, orderValidatedMail } from '../emails.js'
+import { queueMail } from '../mailer.js'
 
 export const adminRouter = Router()
 
@@ -151,6 +154,10 @@ adminRouter.post('/orders/:id/validate', (req, res) => {
     return
   }
   updateOrder(order.id, { status: 'valid', reason: '', stage: 0 })
+
+  const mailData = orderMailData(order.id)
+  if (mailData) queueMail(orderValidatedMail(mailData))
+
   res.json(serialiseOrder(loadOrder(order.id)!))
 })
 
@@ -165,7 +172,12 @@ adminRouter.post('/orders/:id/reject', (req, res) => {
     res.status(400).json({ error: 'Indique un motif avant de rejeter' })
     return
   }
-  updateOrder(order.id, { status: 'rejected', reason: reason.slice(0, 500) })
+  const trimmed = reason.slice(0, 500)
+  updateOrder(order.id, { status: 'rejected', reason: trimmed })
+
+  const mailData = orderMailData(order.id)
+  if (mailData) queueMail(orderRejectedMail(mailData, trimmed))
+
   res.json(serialiseOrder(loadOrder(order.id)!))
 })
 
@@ -194,7 +206,17 @@ adminRouter.post('/orders/:id/stage', (req, res) => {
     res.status(400).json({ error: 'Étape de livraison invalide' })
     return
   }
+  // Only announce a stage the buyer has not been told about yet, so correcting
+  // a mis-click backwards does not send a second "your parcel shipped" email.
+  const isNewStage = stage > order.stage
   updateOrder(order.id, { stage })
+
+  if (isNewStage) {
+    const mailData = orderMailData(order.id)
+    const mail = mailData ? orderStageMail(mailData, stage) : null
+    if (mail) queueMail(mail)
+  }
+
   res.json(serialiseOrder(loadOrder(order.id)!))
 })
 

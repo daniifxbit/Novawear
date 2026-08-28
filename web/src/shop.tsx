@@ -12,8 +12,20 @@ export type View =
   | { name: 'cart' }
   | { name: 'checkout' }
   | { name: 'done'; ref: string }
-  | { name: 'track' }
+  | { name: 'track'; ref?: string }
   | { name: 'admin' }
+
+/**
+ * Emails link back as `/?suivi=NW-2026-1041`. The app is a single view with no
+ * router, so the parameter is read once at boot and then cleared from the URL.
+ */
+function initialView(): View {
+  if (typeof window === 'undefined') return { name: 'home' }
+  const ref = new URLSearchParams(window.location.search).get('suivi')
+  if (!ref) return { name: 'home' }
+  window.history.replaceState(null, '', window.location.pathname)
+  return { name: 'track', ref }
+}
 
 interface CartEntry extends CartLine {
   product: Product
@@ -79,7 +91,7 @@ function shippingCents(subtotalCents: number, country: string): number {
 export function ShopProvider({ children }: { children: ReactNode }) {
   const [catalog, setCatalog] = useState<Catalog | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [view, setView] = useState<View>({ name: 'home' })
+  const [view, setView] = useState<View>(initialView)
   const [query, setQueryState] = useState('')
   const [cart, setCart] = useState<CartLine[]>(readCart)
   const [country, setCountryState] = useState(() => localStorage.getItem(COUNTRY_KEY) ?? 'FR')

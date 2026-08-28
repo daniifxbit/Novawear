@@ -50,7 +50,30 @@ démarrage.
 4. Paiement → coordonnées de livraison, puis IBAN, BIC et **référence de commande
    obligatoire dans le libellé du virement**, avec dépôt de la preuve (image ou PDF).
 5. Suivi → bouton « Suivi » de l'en-tête, recherche par référence, timeline en
-   5 étapes synchronisée avec l'admin.
+   5 étapes synchronisée avec l'admin. Les liens des emails ouvrent directement
+   la commande (`/?suivi=NW-2026-1041`).
+
+## Emails
+
+| Déclencheur                    | Destinataire | Contenu                                          |
+| ------------------------------ | ------------ | ------------------------------------------------ |
+| Preuve de virement déposée     | client       | Récapitulatif, IBAN et référence, lien de suivi   |
+| Preuve de virement déposée     | `ADMIN_EMAIL`| Nouvelle commande à vérifier                      |
+| Paiement validé                | client       | Confirmation, passage en préparation              |
+| Commande rejetée               | client       | Motif communiqué par l'admin                      |
+| Changement d'étape (2 à 5)     | client       | Étape atteinte, statut du séquestre               |
+
+L'étape 1 n'est pas annoncée séparément : elle coïncide avec la validation du
+paiement. Revenir en arrière sur une étape ne renvoie pas d'email.
+
+Sans SMTP configuré, les messages sont **écrits dans `server/data/outbox/`** au
+format `.eml` plutôt qu'envoyés — le serveur le signale au démarrage. Chaque
+tentative est journalisée dans la table `emails` (statut `sent`, `written` ou
+`failed`). Un échec d'envoi ne fait jamais échouer une commande.
+
+Pour de vrais envois, renseigner `SMTP_URL` (ou `SMTP_HOST` et compagnie),
+`MAIL_FROM` et `PUBLIC_URL` — voir `.env.example`. Le domaine expéditeur doit
+avoir SPF et DKIM configurés, sinon les emails partiront en spam.
 
 ## Back-office
 
