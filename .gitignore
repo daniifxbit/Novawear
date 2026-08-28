@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.env
+.env.local
+
+# SQLite database and uploaded files (receipts, product photos)
+server/data/
+
+*.log
+.DS_Store
+*.tsbuildinfo
