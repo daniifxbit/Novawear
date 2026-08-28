@@ -48,11 +48,17 @@ function isValidSession(token: unknown): boolean {
   return Number.isFinite(expiry) && expiry > Date.now()
 }
 
-/** Constant-time comparison of the submitted code against ADMIN_CODE. */
+/**
+ * Constant-time comparison of the submitted code against ADMIN_CODE.
+ *
+ * Case-sensitive: a real passphrase loses a lot of its strength if upper and
+ * lower case are treated as the same character. Only surrounding whitespace is
+ * forgiven, since it usually comes from copy-paste.
+ */
 export function checkCode(submitted: unknown): boolean {
   if (typeof submitted !== 'string') return false
-  const a = Buffer.from(submitted.trim().toUpperCase())
-  const b = Buffer.from(ADMIN_CODE.toUpperCase())
+  const a = Buffer.from(submitted.trim())
+  const b = Buffer.from(ADMIN_CODE)
   // Hash both sides so the comparison stays constant-time regardless of length.
   return crypto.timingSafeEqual(
     crypto.createHash('sha256').update(a).digest(),
