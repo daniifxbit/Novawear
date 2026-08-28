@@ -1,3 +1,4 @@
+import { LEGAL_DOCS } from '../legal/content'
 import { useShop } from '../shop'
 
 export function Footer() {
@@ -40,6 +41,14 @@ export function Footer() {
           <span>Douane à charge du client</span>
         </div>
       </div>
+
+      <nav className="footer__legal" aria-label="Informations légales">
+        {LEGAL_DOCS.map((doc) => (
+          <button key={doc.id} onClick={() => navigate({ name: 'legal', doc: doc.id })}>
+            {doc.navLabel}
+          </button>
+        ))}
+      </nav>
 
       <div className="footer__bar">
         <span>© 2026 Novawear — Revente sélective</span>

@@ -6,6 +6,7 @@ import { CartView } from './views/CartView'
 import { CheckoutView } from './views/CheckoutView'
 import { DoneView } from './views/DoneView'
 import { Home } from './views/Home'
+import { LegalView } from './views/LegalView'
 import { ListView } from './views/ListView'
 import { ProductView } from './views/ProductView'
 import { TrackView } from './views/TrackView'
@@ -40,6 +41,8 @@ function CurrentView() {
       return <TrackView initialRef={view.ref} />
     case 'admin':
       return <AdminView />
+    case 'legal':
+      return <LegalView doc={view.doc} />
   }
 }
 

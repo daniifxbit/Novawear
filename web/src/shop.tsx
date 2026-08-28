@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { api } from './api'
+import type { LegalDocId } from './legal/content'
 import type { Catalog, CartLine, Product } from './types'
 
 const CART_KEY = 'nw_cart_v1'
@@ -14,6 +15,7 @@ export type View =
   | { name: 'done'; ref: string }
   | { name: 'track'; ref?: string }
   | { name: 'admin' }
+  | { name: 'legal'; doc: LegalDocId }
 
 /**
  * Emails link back as `/?suivi=NW-2026-1041`. The app is a single view with no

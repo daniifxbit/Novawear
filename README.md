@@ -75,6 +75,21 @@ Pour de vrais envois, renseigner `SMTP_URL` (ou `SMTP_HOST` et compagnie),
 `MAIL_FROM` et `PUBLIC_URL` — voir `.env.example`. Le domaine expéditeur doit
 avoir SPF et DKIM configurés, sinon les emails partiront en spam.
 
+## Pages légales
+
+Quatre documents accessibles depuis le pied de page : CGV, rétractation et
+retours, politique de confidentialité, mentions légales. Le contenu vit dans
+`web/src/legal/content.ts`.
+
+Ce sont des **bases de travail à faire relire par un juriste**, pas des textes
+prêts à publier. Aucune information d'identité d'entreprise n'y est inventée :
+raison sociale, SIRET, RCS, TVA, hébergeur, médiateur et délais sont laissés en
+`[[champs à compléter]]`, affichés en doré sur la page pour qu'un document
+incomplet ne passe pas inaperçu. Il en reste 38 au total.
+
+L'article 6 des CGV (conservation des fonds) contient les deux rédactions
+possibles selon la décision prise sur le séquestre — il faut en supprimer une.
+
 ## Back-office
 
 Lien « Admin » discret en pied de page, protégé par `ADMIN_CODE`.
