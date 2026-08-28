@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<script src="./doc-page.js"></script>
+<style>
+  html,body{margin:0;padding:0}
+  *{box-sizing:border-box}
+  doc-page:not(:defined){visibility:hidden}
+  a{color:#8A6A24}
+  a:hover{color:#0A0A0A}
+</style>
+</helmet>
+<doc-page size="a4" margin="0.85in">
+  <div style="font-family:Archivo,'Helvetica Neue',Helvetica,sans-serif;font-size:10.5pt;line-height:1.62;color:#1A1A1A">
+
+    <div style="display:flex;align-items:center;gap:14px;border-bottom:1.5px solid #0A0A0A;padding-bottom:14px;margin-bottom:26px">
+      <img src="./assets/dd22-logo.jpeg" alt="DRIP DISTRICT 22" style="width:48px;height:48px;border-radius:50%;object-fit:cover"/>
+      <div style="display:flex;flex-direction:column;gap:3px">
+        <span style="font-family:'Archivo Black',sans-serif;font-size:12pt;letter-spacing:.01em">DRIP DISTRICT 22</span>
+        <span style="font-size:8pt;letter-spacing:.26em;color:#8A6A24;text-transform:uppercase">Spécification technique · back-end</span>
+      </div>
+      <span style="margin-left:auto;font-size:8pt;letter-spacing:.14em;color:#7A7A7A;text-transform:uppercase;text-align:right">v1 · 27 août 2026<br/>Document interne</span>
+    </div>
+
+    <h1 style="font-family:'Archivo Black',sans-serif;font-size:26pt;line-height:1.02;letter-spacing:-.025em;margin:0 0 6px;text-transform:uppercase">Passer la boutique en production</h1>
+    <p style="font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-size:15pt;color:#8A6A24;margin:0 0 22px">Commandes, séquestre et suivi partagés entre appareils</p>
+
+    <p style="margin:0 0 14px">La maquette actuelle est complète côté interface : catalogue, panier, paiement par virement, back-office, séquestre et suivi par référence. Tout l'état vit toutefois dans le navigateur du visiteur (<code style="font-family:ui-monospace,monospace;font-size:9.5pt;background:#F2F0EB;padding:1px 4px">localStorage</code>). Conséquence : une commande passée sur un téléphone est invisible depuis l'ordinateur de la boutique, et le suivi client ne fonctionne que sur l'appareil d'origine.</p>
+    <p style="margin:0 0 14px">Ce document décrit le minimum à construire pour que le site fonctionne réellement, sans changer ni le design ni les parcours déjà validés. Trois briques : une base de données partagée, une API, et un stockage de fichiers pour les preuves de virement.</p>
+
+    <h2 style="font-family:'Archivo Black',sans-serif;font-size:13pt;letter-spacing:-.01em;text-transform:uppercase;margin:30px 0 4px;padding-bottom:7px;border-bottom:1px solid #0A0A0A">1 · Architecture recommandée</h2>
+    <p style="margin:12px 0 12px">Le site reste une application front-end unique. On y ajoute un service géré plutôt qu'un serveur à administrer — moins de maintenance, coût quasi nul au démarrage.</p>
+    <table style="width:100%;border-collapse:collapse;font-size:9.5pt;margin:0 0 8px">
+      <thead>
+        <tr>
+          <th style="text-align:left;border-bottom:1px solid #0A0A0A;padding:7px 8px 7px 0;font-size:8pt;letter-spacing:.14em;text-transform:uppercase">Brique</th>
+          <th style="text-align:left;border-bottom:1px solid #0A0A0A;padding:7px 8px;font-size:8pt;letter-spacing:.14em;text-transform:uppercase">Choix conseillé</th>
+          <th style="text-align:left;border-bottom:1px solid #0A0A0A;padding:7px 0 7px 8px;font-size:8pt;letter-spacing:.14em;text-transform:uppercase">Pourquoi</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding:8px 8px 8px 0;border-bottom:1px solid #E2DFD8;vertical-align:top;font-weight:700">Base de données</td>
+          <td style="padding:8px;border-bottom:1px solid #E2DFD8;vertical-align:top">Supabase (PostgreSQL managé)</td>
+          <td style="padding:8px 0 8px 8px;border-bottom:1px solid #E2DFD8;vertical-align:top">Base, API REST auto-générée, authentification et stockage de fichiers dans un seul service. Offre gratuite suffisante au lancement.</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 8px 8px 0;border-bottom:1px solid #E2DFD8;vertical-align:top;font-weight:700">Fichiers</td>
+          <td style="padding:8px;border-bottom:1px solid #E2DFD8;vertical-align:top">Supabase Storage, bucket privé</td>
+          <td style="padding:8px 0 8px 8px;border-bottom:1px solid #E2DFD8;vertical-align:top">Preuves de virement et photos produit. Accès par URL signée à durée limitée, jamais public.</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 8px 8px 0;border-bottom:1px solid #E2DFD8;vertical-align:top;font-weight:700">Emails</td>
+          <td style="padding:8px;border-bottom:1px solid #E2DFD8;vertical-align:top">Resend ou Brevo</td>
+          <td style="padding:8px 0 8px 8px;border-bottom:1px solid #E2DFD8;vertical-align:top">Confirmation de commande, validation ou rejet, changement d'étape de livraison.</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 8px 8px 0;border-bottom:1px solid #E2DFD8;vertical-align:top;font-weight:700">Séquestre</td>
+          <td style="padding:8px;border-bottom:1px solid #E2DFD8;vertical-align:top">Compte bancaire dédié + registre en base</td>
+          <td style="padding:8px 0 8px 8px;border-bottom:1px solid #E2DFD8;vertical-align:top">Voir section 5 : le séquestre « maison » a des limites juridiques qu'il faut regarder en face.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2 style="font-family:'Archivo Black',sans-serif;font-size:13pt;letter-spacing:-.01em;text-transform:uppercase;margin:30px 0 4px;padding-bottom:7px;border-bottom:1px solid #0A0A0A">2 · Modèle de données</h2>
+    <p style="margin:12px 0 12px">Quatre tables suffisent. Les noms de colonnes reprennent ceux déjà utilisés dans la maquette pour limiter le travail de branchement.</p>
+
+    <div style="border:1px solid #E2DFD8;background:#FAF9F6;padding:14px 16px;margin:0 0 12px">
+      <div style="font-family:'Archivo Black',sans-serif;font-size:10pt;text-transform:uppercase;margin-bottom:8px">products</div>
+      <div style="font-family:ui-monospace,monospace;font-size:9pt;line-height:1.7;color:#3A3A3A">id · ref (unique, DD22-XX-000) · name · category_id · subcategory_id · price_eur · sizes[] · badge · image_path · stock (défaut 1) · is_published · created_at</div>
+    </div>
+    <div style="border:1px solid #E2DFD8;background:#FAF9F6;padding:14px 16px;margin:0 0 12px">
+      <div style="font-family:'Archivo Black',sans-serif;font-size:10pt;text-transform:uppercase;margin-bottom:8px">orders</div>
+      <div style="font-family:ui-monospace,monospace;font-size:9pt;line-height:1.7;color:#3A3A3A">id · ref (unique, DD22-2026-0000) · customer_name · email · phone · address · city · country · subtotal · shipping · total · payment_status (pending / valid / rejected) · reject_reason · delivery_stage (0–4) · escrow_released (bool) · proof_path · created_at · updated_at</div>
+    </div>
+    <div style="border:1px solid #E2DFD8;background:#FAF9F6;padding:14px 16px;margin:0 0 12px">
+      <div style="font-family:'Archivo Black',sans-serif;font-size:10pt;text-transform:uppercase;margin-bottom:8px">order_items</div>
+      <div style="font-family:ui-monospace,monospace;font-size:9pt;line-height:1.7;color:#3A3A3A">id · order_id · product_ref · product_name · size · qty · unit_price · image_path</div>
+    </div>
+    <div style="border:1px solid #E2DFD8;background:#FAF9F6;padding:14px 16px;margin:0 0 14px">
+      <div style="font-family:'Archivo Black',sans-serif;font-size:10pt;text-transform:uppercase;margin-bottom:8px">order_events <span style="font-family:Archivo,sans-serif;font-size:8pt;letter-spacing:.14em;color:#8A6A24">journal d'audit</span></div>
+      <div style="font-family:ui-monospace,monospace;font-size:9pt;line-height:1.7;color:#3A3A3A">id · order_id · type (created / payment_valid / payment_rejected / stage_change / escrow_released) · from_value · to_value · comment · actor · created_at</div>
+    </div>
+    <p style="margin:0 0 14px">Le journal <code style="font-family:ui-monospace,monospace;font-size:9.5pt;background:#F2F0EB;padding:1px 4px">order_events</code> n'est pas optionnel : c'est lui qui prouve, en cas de litige, qui a validé un paiement et quand le séquestre a été libéré. Il alimente aussi la timeline affichée au client, horodatée.</p>
+    <p style="margin:0 0 14px"><strong>Table de configuration</strong> : les coordonnées bancaires éditables dans l'admin deviennent une ligne <code style="font-family:ui-monospace,monospace;font-size:9.5pt;background:#F2F0EB;padding:1px 4px">settings</code> (titulaire, IBAN, BIC, banque) avec historique des modifications — un changement d'IBAN est l'attaque la plus classique sur ce type de boutique.</p>
+
+    <h2 style="font-family:'Archivo Black',sans-serif;font-size:13pt;letter-spacing:-.01em;text-transform:uppercase;margin:30px 0 4px;padding-bottom:7px;border-bottom:1px solid #0A0A0A">3 · Points d'entrée de l'API</h2>
+    <table style="width:100%;border-collapse:collapse;font-size:9.5pt;margin:12px 0 8px">
+      <thead>
+        <tr>
+          <th style="text-align:left;border-bottom:1px solid #0A0A0A;padding:7px 8px 7px 0;font-size:8pt;letter-spacing:.14em;text-transform:uppercase">Route</th>
+          <th style="text-align:left;border-bottom:1px solid #0A0A0A;padding:7px 8px;font-size:8pt;letter-spacing:.14em;text-transform:uppercase">Accès</th>
+          <th style="text-align:left;border-bottom:1px solid #0A0A0A;padding:7px 0 7px 8px;font-size:8pt;letter-spacing:.14em;text-transform:uppercase">Rôle</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding:7px 8px 7px 0;border-bottom:1px solid #E2DFD8;vertical-align:top;font-family:ui-monospace,monospace;font-size:9pt">GET /products</td>
+          <td style="padding:7px 8px;border-bottom:1px solid #E2DFD8;vertical-align:top">Public</td>
+          <td style="padding:7px 0 7px 8px;border-bottom:1px solid #E2DFD8;vertical-align:top">Catalogue publié, filtres catégorie / taille / prix.</td>
+        </tr>
+        <tr>
+          <td style="padding:7px 8px 7px 0;border-bottom:1px solid #E2DFD8;vertical-align:top;font-family:ui-monospace,monospace;font-size:9pt">POST /orders</td>
+          <td style="padding:7px 8px;border-bottom:1px solid #E2DFD8;vertical-align:top">Public</td>
+          <td style="padding:7px 0 7px 8px;border-bottom:1px solid #E2DFD8;vertical-align:top">Crée la commande, génère la référence, renvoie les coordonnées bancaires à afficher.</td>
+        </tr>
+        <tr>
+          <td style="padding:7px 8px 7px 0;border-bottom:1px solid #E2DFD8;vertical-align:top;font-family:ui-monospace,monospace;font-size:9pt">POST /orders/:ref/proof</td>
+          <td style="padding:7px 8px;border-bottom:1px solid #E2DFD8;vertical-align:top">Public</td>
+          <td style="padding:7px 0 7px 8px;border-bottom:1px solid #E2DFD8;vertical-align:top">Dépôt de la preuve (image ou PDF, 10 Mo max), puis passage en attente de vérification.</td>
+        </tr>
+        <tr>
+          <td style="padding:7px 8px 7px 0;border-bottom:1px solid #E2DFD8;vertical-align:top;font-family:ui-monospace,monospace;font-size:9pt">GET /orders/:ref/status</td>
+          <td style="padding:7px 8px;border-bottom:1px solid #E2DFD8;vertical-align:top">Public limité</td>
+          <td style="padding:7px 0 7px 8px;border-bottom:1px solid #E2DFD8;vertical-align:top">Suivi client. Ne renvoie que référence, montant, statut, étape, horodatages — jamais l'adresse ni la preuve.</td>
+        </tr>
+        <tr>
+          <td style="padding:7px 8px 7px 0;border-bottom:1px solid #E2DFD8;vertical-align:top;font-family:ui-monospace,monospace;font-size:9pt">PATCH /admin/orders/:id</td>
+          <td style="padding:7px 8px;border-bottom:1px solid #E2DFD8;vertical-align:top">Admin</td>
+          <td style="padding:7px 0 7px 8px;border-bottom:1px solid #E2DFD8;vertical-align:top">Validation, rejet motivé, changement d'étape, libération du séquestre. Écrit dans le journal.</td>
+        </tr>
+        <tr>
+          <td style="padding:7px 8px 7px 0;border-bottom:1px solid #E2DFD8;vertical-align:top;font-family:ui-monospace,monospace;font-size:9pt">POST · DELETE /admin/products</td>
+          <td style="padding:7px 8px;border-bottom:1px solid #E2DFD8;vertical-align:top">Admin</td>
+          <td style="padding:7px 0 7px 8px;border-bottom:1px solid #E2DFD8;vertical-align:top">Ajout et retrait d'articles, upload de la photo produit.</td>
+        </tr>
+        <tr>
+          <td style="padding:7px 8px 7px 0;border-bottom:1px solid #E2DFD8;vertical-align:top;font-family:ui-monospace,monospace;font-size:9pt">PUT /admin/settings/bank</td>
+          <td style="padding:7px 8px;border-bottom:1px solid #E2DFD8;vertical-align:top">Admin + 2FA</td>
+          <td style="padding:7px 0 7px 8px;border-bottom:1px solid #E2DFD8;vertical-align:top">Modification des coordonnées bancaires, avec confirmation par email au propriétaire.</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="margin:0 0 14px"><strong>Suivi par référence : attention à la confidentialité.</strong> Une référence seule est devinable. Deux options : exiger référence + email pour afficher le suivi, ou générer un jeton de suivi aléatoire envoyé dans l'email de confirmation. La seconde est plus propre et ne coûte rien à implémenter.</p>
+
+    <h2 style="font-family:'Archivo Black',sans-serif;font-size:13pt;letter-spacing:-.01em;text-transform:uppercase;margin:30px 0 4px;padding-bottom:7px;border-bottom:1px solid #0A0A0A">4 · Machine à états d'une commande</h2>
+    <p style="margin:12px 0 12px">Les transitions doivent être contraintes côté serveur, pas seulement dans l'interface : une commande ne peut pas passer « Livré » sans être validée, et le séquestre ne se libère que depuis l'étape finale.</p>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:0 0 14px">
+      <div style="border-left:2px solid #8A6A24;padding:9px 0 9px 12px">
+        <div style="font-family:'Archivo Black',sans-serif;font-size:9.5pt;text-transform:uppercase">Créée → en attente</div>
+        <div style="font-size:9.5pt;color:#4A4A4A">Preuve déposée. Fonds annoncés, non vérifiés.</div>
+      </div>
+      <div style="border-left:2px solid #8A6A24;padding:9px 0 9px 12px">
+        <div style="font-family:'Archivo Black',sans-serif;font-size:9.5pt;text-transform:uppercase">En attente → rejetée</div>
+        <div style="font-size:9.5pt;color:#4A4A4A">Motif obligatoire, envoyé au client. Restitution.</div>
+      </div>
+      <div style="border-left:2px solid #8A6A24;padding:9px 0 9px 12px">
+        <div style="font-family:'Archivo Black',sans-serif;font-size:9.5pt;text-transform:uppercase">En attente → validée</div>
+        <div style="font-size:9.5pt;color:#4A4A4A">Virement constaté en banque. Étape 0, séquestre actif.</div>
+      </div>
+      <div style="border-left:2px solid #8A6A24;padding:9px 0 9px 12px">
+        <div style="font-family:'Archivo Black',sans-serif;font-size:9.5pt;text-transform:uppercase">Étapes 0 → 4</div>
+        <div style="font-size:9.5pt;color:#4A4A4A">Préparation, remise livreur, transit, livraison.</div>
+      </div>
+      <div style="border-left:2px solid #0A0A0A;padding:9px 0 9px 12px;grid-column:1/-1">
+        <div style="font-family:'Archivo Black',sans-serif;font-size:9.5pt;text-transform:uppercase">Étape 4 → séquestre libéré</div>
+        <div style="font-size:9.5pt;color:#4A4A4A">Action distincte de la livraison, idéalement conditionnée à la preuve de remise du transporteur, avec un délai de contestation de 48 h avant virement effectif vers la boutique.</div>
+      </div>
+    </div>
+
+    <h2 style="font-family:'Archivo Black',sans-serif;font-size:13pt;letter-spacing:-.01em;text-transform:uppercase;margin:30px 0 4px;padding-bottom:7px;border-bottom:1px solid #0A0A0A">5 · Le séquestre : ce qu'il faut savoir avant de le promettre</h2>
+    <p style="margin:12px 0 12px">Le site affirme au client que ses fonds sont bloqués jusqu'à la livraison. Cette promesse engage. Détenir l'argent d'un tiers pour le reverser plus tard est une activité réglementée en France et dans l'UE : sur un compte bancaire ordinaire, même dédié, l'argent est juridiquement celui de la boutique dès sa réception, et rien n'est réellement bloqué.</p>
+    <p style="margin:0 0 12px">Trois voies possibles, par ordre de solidité :</p>
+    <ol style="margin:0 0 14px;padding-left:20px">
+      <li style="margin-bottom:8px"><strong>Prestataire de séquestre agréé</strong> (tiers de confiance ou établissement de paiement). Coût par transaction, mais la promesse devient vraie et vérifiable.</li>
+      <li style="margin-bottom:8px"><strong>Paiement avec capture différée</strong> via un prestataire type Stripe ou Mollie : l'argent est autorisé puis capturé à l'expédition. Ce n'est pas un séquestre, mais l'effet perçu est proche et le cadre est propre. Suppose d'accepter la carte en plus du virement.</li>
+      <li><strong>Compte dédié + engagement contractuel</strong>, ce que fait la maquette. Le moins coûteux, mais alors la formulation doit changer : « paiement conservé sur un compte dédié et non utilisé avant expédition », et non « fonds bloqués en séquestre ».</li>
+    </ol>
+    <p style="margin:0 0 14px">Je recommande de trancher ce point avant la mise en ligne, et j'ajusterai les textes de la section escrow en conséquence — c'est une question de conformité, pas de design.</p>
+
+    <h2 style="font-family:'Archivo Black',sans-serif;font-size:13pt;letter-spacing:-.01em;text-transform:uppercase;margin:30px 0 4px;padding-bottom:7px;border-bottom:1px solid #0A0A0A">6 · Sécurité minimale</h2>
+    <ul style="margin:12px 0 14px;padding-left:20px">
+      <li style="margin-bottom:7px">Le code admin en dur (<code style="font-family:ui-monospace,monospace;font-size:9.5pt;background:#F2F0EB;padding:1px 4px">DD22</code>) disparaît : authentification email + mot de passe, deuxième facteur obligatoire pour l'accès aux commandes et aux coordonnées bancaires.</li>
+      <li style="margin-bottom:7px">Preuves de paiement dans un bucket privé, servies par URL signée expirant en quelques minutes. Elles contiennent des données bancaires du client.</li>
+      <li style="margin-bottom:7px">Limitation du nombre de tentatives sur le suivi de commande et sur la connexion admin.</li>
+      <li style="margin-bottom:7px">Journal d'audit consultable, et alerte email à chaque modification d'IBAN ou libération de séquestre.</li>
+      <li>Mentions légales, CGV, politique de retour 14 jours et information sur le droit de rétractation : obligatoires pour vendre en FR, BE et CH.</li>
+    </ul>
+
+    <h2 style="font-family:'Archivo Black',sans-serif;font-size:13pt;letter-spacing:-.01em;text-transform:uppercase;margin:30px 0 4px;padding-bottom:7px;border-bottom:1px solid #0A0A0A">7 · Mise en œuvre par étapes</h2>
+    <table style="width:100%;border-collapse:collapse;font-size:9.5pt;margin:12px 0 8px">
+      <thead>
+        <tr>
+          <th style="text-align:left;border-bottom:1px solid #0A0A0A;padding:7px 8px 7px 0;font-size:8pt;letter-spacing:.14em;text-transform:uppercase">Étape</th>
+          <th style="text-align:left;border-bottom:1px solid #0A0A0A;padding:7px 8px;font-size:8pt;letter-spacing:.14em;text-transform:uppercase">Contenu</th>
+          <th style="text-align:left;border-bottom:1px solid #0A0A0A;padding:7px 0 7px 8px;font-size:8pt;letter-spacing:.14em;text-transform:uppercase">Effort</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding:8px 8px 8px 0;border-bottom:1px solid #E2DFD8;vertical-align:top;font-weight:700">1. Catalogue réel</td>
+          <td style="padding:8px;border-bottom:1px solid #E2DFD8;vertical-align:top">Import des 329 pièces en base, noms et prix définitifs, photos servies depuis le stockage.</td>
+          <td style="padding:8px 0 8px 8px;border-bottom:1px solid #E2DFD8;vertical-align:top">1–2 jours</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 8px 8px 0;border-bottom:1px solid #E2DFD8;vertical-align:top;font-weight:700">2. Commandes</td>
+          <td style="padding:8px;border-bottom:1px solid #E2DFD8;vertical-align:top">Création, preuve de virement, emails, admin branché sur l'API.</td>
+          <td style="padding:8px 0 8px 8px;border-bottom:1px solid #E2DFD8;vertical-align:top">2–3 jours</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 8px 8px 0;border-bottom:1px solid #E2DFD8;vertical-align:top;font-weight:700">3. Suivi client</td>
+          <td style="padding:8px;border-bottom:1px solid #E2DFD8;vertical-align:top">Jeton de suivi, timeline horodatée, notifications de changement d'étape.</td>
+          <td style="padding:8px 0 8px 8px;border-bottom:1px solid #E2DFD8;vertical-align:top">1 jour</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 8px 8px 0;border-bottom:1px solid #E2DFD8;vertical-align:top;font-weight:700">4. Sécurité et conformité</td>
+          <td style="padding:8px;border-bottom:1px solid #E2DFD8;vertical-align:top">Auth admin, 2FA, journal, CGV et mentions légales, arbitrage séquestre.</td>
+          <td style="padding:8px 0 8px 8px;border-bottom:1px solid #E2DFD8;vertical-align:top">2 jours</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="margin:0 0 20px">Soit environ une semaine et demie de développement pour une boutique réellement exploitable, sans toucher au design déjà livré. Le front actuel n'a besoin que d'un remplacement de sa couche de stockage : chaque écran conserve sa structure et ses états.</p>
+
+    <div style="border-top:1.5px solid #0A0A0A;padding-top:14px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:8pt;letter-spacing:.14em;color:#7A7A7A;text-transform:uppercase">
+      <span>Drip District 22 · Spécification back-end</span>
+      <span>Prochaine décision attendue : modèle de séquestre</span>
+    </div>
+  </div>
+</doc-page>
+
+</x-dc>
+</body>
+</html>

@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;padding:0;background:#060606;}
+  *{box-sizing:border-box;}
+  a{color:#C39C6C;text-decoration:none;}
+  a:hover{color:#F5F5F5;}
+  input,button,textarea,select{font-family:inherit;}
+  ::-webkit-scrollbar{height:5px;width:8px}
+  ::-webkit-scrollbar-thumb{background:#2c2c2c}
+  ::-webkit-scrollbar-track{background:#0f0f0f}
+  @keyframes ddFade{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion: reduce){*{animation-duration:.01ms !important;transition-duration:.01ms !important}}
+</style>
+</helmet>
+<div style="min-height:100vh;background:#060606;color:#F5F5F5;font-family:Jost,'Helvetica Neue',Helvetica,sans-serif;font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased">
+
+  <header style="position:sticky;top:0;z-index:60;background:rgba(6,6,6,.95);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.10)">
+    <div style="max-width:1400px;margin:0 auto;padding:12px 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+      <div onClick="{{ goHome }}" style="cursor:pointer;display:flex;align-items:center;gap:11px;flex:0 0 auto">
+        <img src="./assets/novawear-logo.png" alt="NOVAWEAR" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:1px solid rgba(255,255,255,.2)"/>
+        <span style="display:flex;flex-direction:column;line-height:1">
+          <span style="font-family:Jost,sans-serif;font-weight:600;font-size:15px;letter-spacing:.22em">NOVA<span style="color:#C39C6C">WEAR</span></span>
+          <span style="font-size:9px;letter-spacing:.34em;color:rgba(255,255,255,.5);margin-top:3px">STYLE. CONFIDENCE. NOVA.</span>
+        </span>
+      </div>
+
+      <div style="flex:1 1 190px;min-width:150px;order:3;display:flex;align-items:center;gap:9px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.04);padding:9px 13px;transition:border-color .4s cubic-bezier(.32,.94,.6,1)" style-hover="border-color:#C39C6C">
+        <span style="width:8px;height:8px;border:1px solid rgba(255,255,255,.5);border-radius:50%;flex:0 0 auto"></span>
+        <input value="{{ q }}" onChange="{{ onSearch }}" placeholder="Rechercher un article, une référence…" style="flex:1;min-width:0;background:transparent;border:0;outline:0;color:#F5F5F5;font-size:13px"/>
+      </div>
+
+      <div style="order:4;flex:0 0 auto;display:flex;align-items:center;gap:10px">
+        <button onClick="{{ goCart }}" style="{{ cartBtnStyle }}" style-hover="background:#C39C6C;color:#060606">PANIER · {{ cartCount }}</button>
+        <button onClick="{{ goTrack }}" style="background:transparent;border:1px solid rgba(255,255,255,.16);color:rgba(255,255,255,.6);padding:9px 13px;font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;transition:color .4s cubic-bezier(.32,.94,.6,1),border-color .4s cubic-bezier(.32,.94,.6,1)" style-hover="color:#F5F5F5;border-color:rgba(255,255,255,.5)">Suivi</button>
+      </div>
+
+      <nav style="order:5;flex:1 1 100%;display:flex;gap:20px;overflow-x:auto;padding:7px 0 2px">
+        <sc-for list="{{ cats }}" as="c" hint-placeholder-count="7">
+          <button onClick="{{ c.go }}" style="{{ c.navStyle }}" style-hover="color:#F5F5F5">{{ c.label }}</button>
+        </sc-for>
+      </nav>
+    </div>
+  </header>
+
+  <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+    <section style="position:relative;overflow:hidden;background-image:url('./assets/hero-bg.jpg');background-size:cover;background-position:center;border-bottom:1px solid rgba(255,255,255,.10);animation:ddFade .9s cubic-bezier(.14,1,.34,1) both">
+      <div style="position:absolute;inset:0;background:radial-gradient(120% 80% at 50% 42%,rgba(6,6,6,0),rgba(6,6,6,.55) 62%,rgba(6,6,6,.92));pointer-events:none"></div>
+      <div style="position:relative;max-width:1320px;margin:0 auto;padding:clamp(34px,6vw,64px) 22px clamp(30px,5vw,56px)">
+        <div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px">
+          <span style="font-size:10px;letter-spacing:.36em;color:rgba(255,255,255,.55);text-transform:uppercase">Streetwear premium · France · Belgique · Suisse</span>
+          <h1 style="margin:14px 0 0;display:flex;flex-direction:column;align-items:center;line-height:.84">
+            <span style="font-family:Jost,sans-serif;font-weight:600;font-size:clamp(40px,10vw,116px);letter-spacing:-.04em;text-transform:uppercase;font-weight:500">STYLE.</span>
+            <span style="font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-weight:400;font-size:clamp(52px,13.5vw,158px);letter-spacing:-.02em;color:#C39C6C;line-height:.9;margin-top:-.06em">confidence.</span>
+          </h1>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:clamp(20px,3vw,38px);align-items:center;margin-top:clamp(24px,4vw,40px)">
+          <div style="display:flex;flex-direction:column;gap:14px;order:1">
+            <h2 style="font-family:Jost,sans-serif;font-weight:600;font-size:clamp(17px,2.4vw,22px);line-height:1.15;letter-spacing:-.01em;margin:0;text-transform:uppercase;text-wrap:pretty">Une pièce,<br/>un seul exemplaire</h2>
+            <p style="color:rgba(255,255,255,.6);font-size:13px;margin:0;max-width:270px;text-wrap:pretty">Chaque article du catalogue est sourcé à l'unité et vérifié avant mise en ligne. Ce qui part ne revient pas.</p>
+            <div style="display:flex;gap:10px;align-items:flex-start;margin-top:4px">
+              <span style="width:7px;height:7px;background:#C39C6C;margin-top:6px;flex:0 0 auto"></span>
+              <span style="font-size:11px;letter-spacing:.14em;color:rgba(255,255,255,.5);text-transform:uppercase;text-wrap:pretty">Authenticité vérifiée · expédition 48 h</span>
+            </div>
+          </div>
+
+          <div style="order:2;display:flex;justify-content:center;padding-bottom:46px">
+            <div style="position:relative;width:min(320px,74vw)">
+              <div style="aspect-ratio:4/5;overflow:hidden;border:1px solid rgba(195,156,108,.45);background:#111111;box-shadow:0 40px 90px rgba(0,0,0,.6)">
+                <img src="./assets/photos/img145.jpg" alt="Sélection NOVAWEAR" style="width:100%;height:100%;object-fit:cover"/>
+              </div>
+              <button onClick="{{ goFirstCat }}" style="position:absolute;left:50%;bottom:-34px;transform:translateX(-50%);width:126px;height:126px;border-radius:50%;background:#C39C6C;border:1px solid #C39C6C;color:#060606;font-family:Jost,sans-serif;font-weight:600;font-size:11px;letter-spacing:.1em;text-transform:uppercase;line-height:1.35;cursor:pointer;transition:background .4s cubic-bezier(.32,.94,.6,1),color .4s cubic-bezier(.32,.94,.6,1)" style-hover="background:#060606;color:#C39C6C">Voir le<br/>catalogue</button>
+            </div>
+          </div>
+
+          <div style="order:3;display:flex;flex-direction:column;gap:14px;align-items:flex-start">
+            <span style="font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:clamp(20px,2.8vw,28px);color:#F5F5F5">{{ totalCount }} pièces en stock</span>
+            <div style="border:1px solid rgba(255,255,255,.14);background:rgba(20,20,20,.72);backdrop-filter:blur(14px);padding:14px 16px;transform:rotate(-2.5deg);max-width:230px;display:flex;flex-direction:column;gap:6px">
+              <span style="font-size:9px;letter-spacing:.2em;color:rgba(255,255,255,.45);text-transform:uppercase">Paiement</span>
+              <span style="font-family:Jost,sans-serif;font-weight:600;font-size:14px;color:#C39C6C;text-transform:uppercase">Virement bancaire</span>
+              <span style="font-size:11px;color:rgba(255,255,255,.5);text-wrap:pretty">Coordonnées et référence fournies au panier.</span>
+            </div>
+            <div style="border:1px solid rgba(195,156,108,.4);background:rgba(195,156,108,.10);backdrop-filter:blur(14px);padding:14px 16px;transform:rotate(2deg);max-width:230px;display:flex;flex-direction:column;gap:6px;margin-left:18px">
+              <span style="font-size:9px;letter-spacing:.2em;color:rgba(255,255,255,.5);text-transform:uppercase">Livraison</span>
+              <span style="font-family:Jost,sans-serif;font-weight:600;font-size:14px;text-transform:uppercase">FR · BE · CH</span>
+              <span style="font-size:11px;color:rgba(255,255,255,.55)">48 h en France et Belgique.</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="position:relative;width:min(430px,72vw);height:1px;background:linear-gradient(90deg,transparent,rgba(195,156,108,.35) 16%,#C39C6C 50%,rgba(195,156,108,.35) 84%,transparent);margin:clamp(46px,7vw,72px) auto 0">
+          <div style="position:absolute;left:23%;top:0;width:1px;height:15px;background:linear-gradient(#C39C6C,transparent)"></div>
+          <div style="position:absolute;left:48%;top:0;width:1px;height:31px;background:linear-gradient(#C39C6C,transparent)"></div>
+          <div style="position:absolute;left:62%;top:0;width:1px;height:9px;background:linear-gradient(#C39C6C,transparent)"></div>
+          <div style="position:absolute;left:78%;top:0;width:1px;height:21px;background:linear-gradient(#C39C6C,transparent)"></div>
+        </div>
+      </div>
+    </section>
+
+    <section style="max-width:1400px;margin:0 auto;padding:0 22px 90px">
+      <div style="display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;border-bottom:1px solid rgba(255,255,255,.10);padding-bottom:14px;margin-bottom:26px">
+        <h2 style="font-family:Jost,sans-serif;font-weight:600;font-size:clamp(18px,3.4vw,26px);letter-spacing:-.01em;margin:0;text-transform:uppercase">Le catalogue</h2>
+        <span style="font-size:11px;letter-spacing:.2em;color:rgba(255,255,255,.5);text-transform:uppercase">7 catégories · {{ totalCount }} pièces en stock</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,272px),1fr));gap:20px">
+        <sc-for list="{{ homeCats }}" as="c" hint-placeholder-count="7">
+          <div onClick="{{ c.go }}" style="cursor:pointer;border:1px solid rgba(255,255,255,.10);background:#0F0F0F;display:flex;flex-direction:column;transition:border-color .4s cubic-bezier(.32,.94,.6,1)" style-hover="border-color:#C39C6C">
+            <div style="position:relative;aspect-ratio:4/5;overflow:hidden;background:#111111">
+              <img src="{{ c.img }}" alt="{{ c.label }}" loading="lazy" style="width:100%;height:100%;object-fit:cover;transition:transform .8s cubic-bezier(.32,.94,.6,1)" style-hover="transform:scale(1.05)"/>
+              <div style="position:absolute;left:0;bottom:0;width:100%;padding:18px;background:linear-gradient(transparent,rgba(6,6,6,.94));pointer-events:none">
+                <div style="font-family:Jost,sans-serif;font-weight:600;font-size:clamp(19px,2.5vw,26px);line-height:1;letter-spacing:-.02em;text-transform:uppercase">{{ c.label }}</div>
+                <div style="width:36px;height:1px;background:#C39C6C;margin:10px 0 8px"></div>
+                <div style="font-size:10px;letter-spacing:.14em;color:rgba(255,255,255,.55);text-transform:uppercase;text-wrap:pretty">{{ c.subLine }}</div>
+              </div>
+            </div>
+            <div style="padding:13px 18px;display:flex;justify-content:space-between;align-items:center;font-size:11px;letter-spacing:.16em;color:rgba(255,255,255,.5);text-transform:uppercase;border-top:1px solid rgba(255,255,255,.10)">
+              <span>{{ c.count }} pièces</span><span style="color:#C39C6C">Voir →</span>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section style="border-top:1px solid rgba(255,255,255,.10);background:#0d0d0d">
+      <div style="max-width:1400px;margin:0 auto;padding:clamp(48px,7vw,84px) 22px">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:clamp(24px,4vw,54px);align-items:start">
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <span style="font-size:10px;letter-spacing:.28em;color:#C39C6C;text-transform:uppercase">Paiement sécurisé · séquestre</span>
+            <h2 style="font-family:Jost,sans-serif;font-weight:600;font-size:clamp(24px,4.4vw,40px);line-height:.98;letter-spacing:-.03em;margin:0;text-transform:uppercase;text-wrap:pretty">Ton argent reste bloqué jusqu'à la livraison</h2>
+            <div style="position:relative;width:180px;height:1px;background:#C39C6C;margin-top:4px">
+              <div style="position:absolute;left:22%;top:0;width:1px;height:13px;background:linear-gradient(#C39C6C,transparent)"></div>
+              <div style="position:absolute;left:58%;top:0;width:1px;height:22px;background:linear-gradient(#C39C6C,transparent)"></div>
+            </div>
+            <p style="color:rgba(255,255,255,.62);font-size:14px;max-width:430px;margin:8px 0 0;text-wrap:pretty">Ton virement n'arrive pas directement sur le compte de la boutique : il est placé sur un compte de séquestre. NOVAWEAR ne touche rien tant que le colis n'est pas entre tes mains. Si la livraison échoue, les fonds te sont rendus.</p>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px">
+              <button onClick="{{ goTrack }}" style="background:#C39C6C;border:1px solid #C39C6C;color:#060606;font-family:Jost,sans-serif;font-weight:600;font-size:11px;letter-spacing:.16em;text-transform:uppercase;padding:15px 20px;cursor:pointer;transition:background .4s cubic-bezier(.32,.94,.6,1),color .4s cubic-bezier(.32,.94,.6,1)" style-hover="background:#060606;color:#C39C6C">Suivre ma commande</button>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <sc-for list="{{ escrowSteps }}" as="s" hint-placeholder-count="4">
+              <div style="display:flex;gap:15px;border:1px solid rgba(255,255,255,.10);background:#111111;padding:16px 18px;transition:border-color .4s cubic-bezier(.32,.94,.6,1)" style-hover="border-color:rgba(195,156,108,.55)">
+                <span style="font-family:Jost,sans-serif;font-weight:600;font-size:13px;color:#C39C6C;flex:0 0 auto;padding-top:2px">{{ s.num }}</span>
+                <span style="display:flex;flex-direction:column;gap:5px;min-width:0">
+                  <span style="font-family:Jost,sans-serif;font-weight:600;font-size:13px;text-transform:uppercase">{{ s.title }}</span>
+                  <span style="font-size:12px;color:rgba(255,255,255,.55);text-wrap:pretty">{{ s.desc }}</span>
+                </span>
+              </div>
+            </sc-for>
+            <span style="font-size:11px;color:rgba(255,255,255,.35);text-wrap:pretty;margin-top:4px">Le séquestre est déclenché à la vérification du virement. Aucun frais supplémentaire pour l'acheteur.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </sc-if>
+
+  <sc-if value="{{ isTrack }}" hint-placeholder-val="{{ false }}">
+    <section style="max-width:900px;margin:0 auto;padding:34px 22px 80px">
+      <span style="font-size:10px;letter-spacing:.28em;color:#C39C6C;text-transform:uppercase">Suivi de commande</span>
+      <h1 style="font-family:Jost,sans-serif;font-weight:600;font-size:clamp(26px,5.4vw,46px);letter-spacing:-.03em;margin:14px 0 0;text-transform:uppercase">Où est mon colis ?</h1>
+      <div style="width:170px;height:1px;background:#C39C6C;margin:18px 0 26px"></div>
+      <p style="color:rgba(255,255,255,.6);font-size:14px;max-width:520px;margin:0 0 22px;text-wrap:pretty">Saisis la référence reçue à la commande (format NW-2026-1041). Elle figure aussi dans le libellé de ton virement.</p>
+
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:stretch;max-width:560px">
+        <input value="{{ trackInput }}" onChange="{{ setTrack }}" placeholder="NW-2026-1041" style="flex:1 1 220px;min-width:0;background:#111111;border:1px solid rgba(255,255,255,.16);color:#F5F5F5;padding:14px;font-size:14px;outline:0;letter-spacing:.06em"/>
+        <button onClick="{{ doTrack }}" style="background:#C39C6C;border:1px solid #C39C6C;color:#060606;font-family:Jost,sans-serif;font-weight:600;font-size:11px;letter-spacing:.16em;text-transform:uppercase;padding:14px 22px;cursor:pointer;transition:background .4s cubic-bezier(.32,.94,.6,1),color .4s cubic-bezier(.32,.94,.6,1)" style-hover="background:#060606;color:#C39C6C">Vérifier</button>
+      </div>
+      <sc-if value="{{ trackErr }}" hint-placeholder-val="{{ false }}">
+        <span style="display:block;font-size:11px;letter-spacing:.14em;color:#C39C6C;text-transform:uppercase;margin-top:14px">{{ trackErr }}</span>
+      </sc-if>
+
+      <sc-if value="{{ trackFound }}" hint-placeholder-val="{{ false }}">
+        <div style="border:1px solid rgba(255,255,255,.10);background:#111111;margin-top:30px">
+          <div style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:18px 20px;border-bottom:1px solid rgba(255,255,255,.08)">
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <span style="font-family:Jost,sans-serif;font-weight:600;font-size:15px;color:#C39C6C">{{ track.ref }}</span>
+              <span style="font-size:11px;color:rgba(255,255,255,.45)">{{ track.date }} · {{ track.count }}</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px;margin-left:auto;text-align:right">
+              <span style="font-size:10px;letter-spacing:.18em;color:rgba(255,255,255,.35);text-transform:uppercase">Montant</span>
+              <span style="font-family:Jost,sans-serif;font-weight:600;font-size:16px">{{ track.total }}</span>
+            </div>
+            <span style="border:1px solid #C39C6C;color:#C39C6C;font-size:9px;font-weight:700;letter-spacing:.18em;padding:7px 11px;text-transform:uppercase;flex:0 0 auto">{{ track.escrow }}</span>
+          </div>
+
+          <sc-if value="{{ track.pending }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:20px;font-size:13px;color:rgba(255,255,255,.6);text-wrap:pretty">Virement en cours de vérification. Ton paiement est déjà en séquestre : le suivi de livraison démarre dès la validation.</div>
+          </sc-if>
+          <sc-if value="{{ track.rejected }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:20px;display:flex;flex-direction:column;gap:8px">
+              <span style="font-family:Jost,sans-serif;font-weight:600;font-size:13px;text-transform:uppercase;color:#C39C6C">Commande rejetée</span>
+              <span style="font-size:13px;color:rgba(255,255,255,.6)">Motif : {{ track.rejectedReason }}</span>
+              <span style="font-size:12px;color:rgba(255,255,255,.45);text-wrap:pretty">Les fonds en séquestre te sont restitués. Contacte-nous pour relancer la commande.</span>
+            </div>
+          </sc-if>
+
+          <div style="padding:22px 20px;display:flex;flex-direction:column">
+            <sc-for list="{{ track.steps }}" as="s" hint-placeholder-count="5">
+              <div style="display:flex;gap:15px;align-items:stretch">
+                <div style="display:flex;flex-direction:column;align-items:center;flex:0 0 auto">
+                  <span style="{{ s.dotStyle }}"></span>
+                  <span style="{{ s.lineStyle }}"></span>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:5px;padding-bottom:20px;min-width:0">
+                  <span style="{{ s.labelStyle }}">{{ s.label }}</span>
+                  <span style="{{ s.descStyle }}">{{ s.desc }}</span>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+    </section>
+  </sc-if>
+
+  <sc-if value="{{ isList }}" hint-placeholder-val="{{ false }}">
+    <section style="max-width:1400px;margin:0 auto;padding:32px 22px 80px">
+      <div style="display:flex;align-items:center;gap:9px;font-size:11px;letter-spacing:.16em;color:rgba(255,255,255,.5);text-transform:uppercase;margin-bottom:18px;flex-wrap:wrap">
+        <span onClick="{{ goHome }}" style="cursor:pointer" style-hover="color:#C39C6C">Catalogue</span>
+        <span style="color:#3a3a3a">/</span>
+        <span style="color:#F5F5F5">{{ listCat }}</span>
+        <sc-if value="{{ listSub }}" hint-placeholder-val="{{ false }}">
+          <span style="color:#3a3a3a">/</span><span style="color:#C39C6C">{{ listSub }}</span>
+        </sc-if>
+      </div>
+
+      <h1 style="font-family:Jost,sans-serif;font-weight:600;font-size:clamp(28px,6vw,54px);line-height:.94;letter-spacing:-.03em;margin:0;text-transform:uppercase">{{ listTitle }}</h1>
+      <div style="position:relative;width:min(300px,60vw);height:1px;background:linear-gradient(90deg,#C39C6C,rgba(195,156,108,.15));margin:18px 0 24px">
+        <div style="position:absolute;left:12%;top:0;width:1px;height:13px;background:linear-gradient(#C39C6C,transparent)"></div>
+        <div style="position:absolute;left:34%;top:0;width:1px;height:24px;background:linear-gradient(#C39C6C,transparent)"></div>
+        <div style="position:absolute;left:57%;top:0;width:1px;height:8px;background:linear-gradient(rgba(195,156,108,.7),transparent)"></div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:13px;border-top:1px solid rgba(255,255,255,.10);border-bottom:1px solid rgba(255,255,255,.10);padding:18px 0;margin-bottom:26px">
+        <div style="display:flex;gap:9px;flex-wrap:wrap;align-items:center">
+          <span style="font-size:10px;letter-spacing:.22em;color:rgba(255,255,255,.35);text-transform:uppercase;width:104px;flex:0 0 auto">Sous-catégorie</span>
+          <sc-for list="{{ subChips }}" as="s" hint-placeholder-count="5">
+            <button onClick="{{ s.go }}" style="{{ s.style }}" style-hover="border-color:#C39C6C;color:#F5F5F5">{{ s.label }}</button>
+          </sc-for>
+        </div>
+        <div style="display:flex;gap:9px;flex-wrap:wrap;align-items:center">
+          <span style="font-size:10px;letter-spacing:.22em;color:rgba(255,255,255,.35);text-transform:uppercase;width:104px;flex:0 0 auto">Taille</span>
+          <sc-for list="{{ sizeChips }}" as="s" hint-placeholder-count="7">
+            <button onClick="{{ s.go }}" style="{{ s.style }}" style-hover="border-color:#C39C6C;color:#F5F5F5">{{ s.label }}</button>
+          </sc-for>
+        </div>
+        <div style="display:flex;gap:9px;flex-wrap:wrap;align-items:center">
+          <span style="font-size:10px;letter-spacing:.22em;color:rgba(255,255,255,.35);text-transform:uppercase;width:104px;flex:0 0 auto">Prix</span>
+          <sc-for list="{{ priceChips }}" as="s" hint-placeholder-count="5">
+            <button onClick="{{ s.go }}" style="{{ s.style }}" style-hover="border-color:#C39C6C;color:#F5F5F5">{{ s.label }}</button>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:20px">
+        <span style="font-size:11px;letter-spacing:.2em;color:rgba(255,255,255,.5);text-transform:uppercase">{{ resultLine }}</span>
+        <button onClick="{{ resetFilters }}" style="background:transparent;border:0;border-bottom:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.5);font-size:11px;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;padding:2px 0;transition:color .4s cubic-bezier(.32,.94,.6,1),border-color .4s cubic-bezier(.32,.94,.6,1)" style-hover="color:#C39C6C;border-color:#C39C6C">Réinitialiser</button>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,236px),1fr));gap:20px">
+        <sc-for list="{{ products }}" as="p" hint-placeholder-count="8">
+          <div onClick="{{ p.go }}" style="cursor:pointer;border:1px solid rgba(255,255,255,.10);background:#111111;display:flex;flex-direction:column;transition:border-color .4s cubic-bezier(.32,.94,.6,1)" style-hover="border-color:#C39C6C">
+            <div style="position:relative;aspect-ratio:4/5;overflow:hidden;background:#171717">
+              <img src="{{ p.img }}" alt="{{ p.name }}" loading="lazy" style="width:100%;height:100%;object-fit:cover;transition:transform .8s cubic-bezier(.32,.94,.6,1)" style-hover="transform:scale(1.05)"/>
+              <sc-if value="{{ p.badge }}" hint-placeholder-val="{{ false }}">
+                <span style="position:absolute;top:10px;left:10px;background:rgba(6,6,6,.88);border:1px solid #C39C6C;color:#C39C6C;font-size:9px;font-weight:700;letter-spacing:.18em;padding:5px 9px;text-transform:uppercase;pointer-events:none">{{ p.badge }}</span>
+              </sc-if>
+            </div>
+            <div style="padding:14px 15px 16px;display:flex;flex-direction:column;gap:8px;flex:1">
+              <div style="font-size:9px;letter-spacing:.2em;color:rgba(255,255,255,.45);text-transform:uppercase">{{ p.crumb }}</div>
+              <div style="font-family:Jost,sans-serif;font-weight:600;font-size:14px;line-height:1.15;text-transform:uppercase">{{ p.name }}</div>
+              <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:1px">
+                <sc-for list="{{ p.sizes }}" as="sz" hint-placeholder-count="4">
+                  <span style="font-size:10px;color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.14);padding:2px 6px">{{ sz }}</span>
+                </sc-for>
+              </div>
+              <div style="margin-top:auto;padding-top:11px;display:flex;justify-content:space-between;align-items:flex-end;gap:10px;border-top:1px solid rgba(255,255,255,.10)">
+                <div>
+                  <div style="font-family:Jost,sans-serif;font-weight:600;font-size:16px;color:#C39C6C;letter-spacing:-.01em">{{ p.eur }}</div>
+                  <div style="font-size:10px;color:rgba(255,255,255,.45);margin-top:2px">{{ p.chf }}</div>
+                </div>
+                <span style="font-size:9px;letter-spacing:.1em;color:rgba(255,255,255,.35)">{{ p.ref }}</span>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+
+      <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ false }}">
+        <div style="border:1px solid rgba(255,255,255,.10);padding:60px 24px;text-align:center;color:rgba(255,255,255,.5);font-size:13px">Aucun article ne correspond à ces filtres.</div>
+      </sc-if>
+    </section>
+  </sc-if>
+
+  <sc-if value="{{ isProduct }}" hint-placeholder-val="{{ false }}">
+    <section style="max-width:1400px;margin:0 auto;padding:32px 22px 80px">
+      <div style="display:flex;align-items:center;gap:9px;font-size:11px;letter-spacing:.16em;color:rgba(255,255,255,.5);text-transform:uppercase;margin-bottom:24px;flex-wrap:wrap">
+        <span onClick="{{ goHome }}" style="cursor:pointer" style-hover="color:#C39C6C">Catalogue</span>
+        <span style="color:#3a3a3a">/</span>
+        <span onClick="{{ goDetailCat }}" style="cursor:pointer" style-hover="color:#C39C6C">{{ d.cat }}</span>
+        <span style="color:#3a3a3a">/</span>
+        <span onClick="{{ goDetailSub }}" style="cursor:pointer;color:#C39C6C">{{ d.sub }}</span>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,330px),1fr));gap:clamp(22px,4vw,54px);align-items:start">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="position:relative;aspect-ratio:4/5;overflow:hidden;background:#111111;border:1px solid rgba(255,255,255,.10)">
+            <img src="{{ d.mainImg }}" alt="{{ d.name }}" style="width:100%;height:100%;object-fit:cover"/>
+            <sc-if value="{{ d.badge }}" hint-placeholder-val="{{ false }}">
+              <span style="position:absolute;top:14px;left:14px;background:rgba(6,6,6,.88);border:1px solid #C39C6C;color:#C39C6C;font-size:9px;font-weight:700;letter-spacing:.18em;padding:6px 10px;text-transform:uppercase">{{ d.badge }}</span>
+            </sc-if>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+            <sc-for list="{{ d.thumbs }}" as="t" hint-placeholder-count="4">
+              <div onClick="{{ t.pick }}" style="{{ t.style }}">
+                <img src="{{ t.img }}" alt="vue" loading="lazy" style="width:100%;height:100%;object-fit:cover"/>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column">
+          <span style="font-size:10px;letter-spacing:.24em;color:rgba(255,255,255,.5);text-transform:uppercase">{{ d.crumb }}</span>
+          <h1 style="font-family:Jost,sans-serif;font-weight:600;font-size:clamp(26px,5vw,44px);line-height:.98;letter-spacing:-.03em;margin:14px 0 0;text-transform:uppercase">{{ d.name }}</h1>
+          <div style="position:relative;width:140px;height:1px;background:#C39C6C;margin:18px 0 20px">
+            <div style="position:absolute;left:18%;top:0;width:1px;height:14px;background:linear-gradient(#C39C6C,transparent)"></div>
+            <div style="position:absolute;left:62%;top:0;width:1px;height:8px;background:linear-gradient(#C39C6C,transparent)"></div>
+          </div>
+
+          <div style="display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap">
+            <span style="font-family:Jost,sans-serif;font-weight:600;font-size:clamp(25px,4.4vw,36px);color:#C39C6C;letter-spacing:-.02em;line-height:1">{{ d.eur }}</span>
+            <span style="font-size:12px;color:rgba(255,255,255,.5)">{{ d.chf }} · indicatif Suisse</span>
+          </div>
+
+          <p style="color:rgba(255,255,255,.68);font-size:14px;max-width:520px;margin:24px 0 0;text-wrap:pretty">{{ d.desc }}</p>
+
+          <div style="display:flex;flex-direction:column;gap:11px;margin:28px 0 0">
+            <span style="font-size:10px;letter-spacing:.24em;color:rgba(255,255,255,.35);text-transform:uppercase">Tailles disponibles</span>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <sc-for list="{{ d.sizes }}" as="s" hint-placeholder-count="5">
+                <button onClick="{{ s.pick }}" style="{{ s.style }}" style-hover="border-color:#C39C6C;color:#F5F5F5">{{ s.label }}</button>
+              </sc-for>
+            </div>
+          </div>
+
+          <button onClick="{{ addToCart }}" style="margin-top:30px;background:#C39C6C;border:1px solid #C39C6C;color:#060606;font-family:Jost,sans-serif;font-weight:600;font-size:13px;letter-spacing:.16em;text-transform:uppercase;padding:18px 26px;cursor:pointer;max-width:520px;transition:background .4s cubic-bezier(.32,.94,.6,1),color .4s cubic-bezier(.32,.94,.6,1)" style-hover="background:#060606;color:#C39C6C">Ajouter au panier</button>
+          <sc-if value="{{ addedMsg }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;gap:14px;align-items:center;margin-top:14px;flex-wrap:wrap">
+              <span style="font-size:11px;letter-spacing:.16em;color:#C39C6C;text-transform:uppercase">{{ addedMsg }}</span>
+              <button onClick="{{ goCart }}" style="background:transparent;border:0;border-bottom:1px solid #C39C6C;color:#C39C6C;font-size:11px;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;padding:2px 0">Voir le panier →</button>
+            </div>
+          </sc-if>
+
+          <div style="display:flex;flex-direction:column;gap:10px;margin-top:32px;border-top:1px solid rgba(255,255,255,.10);padding-top:22px;font-size:12px;color:rgba(255,255,255,.5)">
+            <div style="display:flex;justify-content:space-between;gap:14px"><span style="letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.35)">Référence</span><span style="color:#F5F5F5">{{ d.ref }}</span></div>
+            <div style="display:flex;justify-content:space-between;gap:14px"><span style="letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.35)">Catégorie</span><span style="color:#F5F5F5">{{ d.crumb }}</span></div>
+            <div style="display:flex;justify-content:space-between;gap:14px"><span style="letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.35)">Paiement</span><span style="color:#F5F5F5">Virement bancaire</span></div>
+            <div style="display:flex;justify-content:space-between;gap:14px"><span style="letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.35)">Livraison</span><span style="color:#F5F5F5">FR · BE 48 h · CH 3–5 j</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:clamp(46px,7vw,80px)">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:14px;border-bottom:1px solid rgba(255,255,255,.10);padding-bottom:13px;margin-bottom:22px">
+          <h2 style="font-family:Jost,sans-serif;font-weight:600;font-size:clamp(15px,3vw,21px);margin:0;text-transform:uppercase;letter-spacing:-.01em">Dans la même sous-catégorie</h2>
+          <span onClick="{{ goDetailSub }}" style="cursor:pointer;font-size:11px;letter-spacing:.16em;color:#C39C6C;text-transform:uppercase">Tout voir →</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,190px),1fr));gap:16px">
+          <sc-for list="{{ related }}" as="p" hint-placeholder-count="5">
+            <div onClick="{{ p.go }}" style="cursor:pointer;border:1px solid rgba(255,255,255,.10);background:#111111;transition:border-color .4s cubic-bezier(.32,.94,.6,1)" style-hover="border-color:#C39C6C">
+              <div style="position:relative;aspect-ratio:4/5;overflow:hidden;background:#171717">
+                <img src="{{ p.img }}" alt="{{ p.name }}" loading="lazy" style="width:100%;height:100%;object-fit:cover;transition:transform .8s cubic-bezier(.32,.94,.6,1)" style-hover="transform:scale(1.05)"/>
+              </div>
+              <div style="padding:12px 13px 14px;display:flex;flex-direction:column;gap:6px">
+                <div style="font-family:Jost,sans-serif;font-weight:600;font-size:12px;line-height:1.15;text-transform:uppercase">{{ p.name }}</div>
+                <div style="font-size:13px;color:#C39C6C;font-weight:700">{{ p.eur }}</div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+  </sc-if>
+
+  <sc-if value="{{ isCart }}" hint-placeholder-val="{{ false }}">
+    <section style="max-width:1180px;margin:0 auto;padding:32px 22px 80px">
+      <h1 style="font-family:Jost,sans-serif;font-weight:600;font-size:clamp(26px,5.4vw,46px);letter-spacing:-.03em;margin:0;text-transform:uppercase">Panier</h1>
+      <div style="width:170px;height:1px;background:#C39C6C;margin:16px 0 30px"></div>
+
+      <sc-if value="{{ cartEmpty }}" hint-placeholder-val="{{ false }}">
+        <div style="border:1px solid rgba(255,255,255,.10);padding:56px 24px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:18px">
+          <span style="color:rgba(255,255,255,.5);font-size:13px">Ton panier est vide.</span>
+          <button onClick="{{ goHome }}" style="background:#C39C6C;border:0;color:#060606;font-family:Jost,sans-serif;font-weight:600;font-size:12px;letter-spacing:.16em;text-transform:uppercase;padding:14px 22px;cursor:pointer">Voir le catalogue</button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ cartHasItems }}" hint-placeholder-val="{{ true }}">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:clamp(22px,3.5vw,44px);align-items:start">
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <sc-for list="{{ cartItems }}" as="it" hint-placeholder-count="2">
+              <div style="display:flex;gap:14px;border:1px solid rgba(255,255,255,.10);background:#111111;padding:12px">
+                <div style="width:78px;flex:0 0 auto;aspect-ratio:4/5;overflow:hidden;background:#171717">
+                  <img src="{{ it.img }}" alt="{{ it.name }}" style="width:100%;height:100%;object-fit:cover"/>
+                </div>
+                <div style="flex:1;display:flex;flex-direction:column;gap:6px;min-width:0">
+                  <div style="font-family:Jost,sans-serif;font-weight:600;font-size:13px;text-transform:uppercase;line-height:1.2">{{ it.name }}</div>
+                  <div style="font-size:10px;letter-spacing:.16em;color:rgba(255,255,255,.45);text-transform:uppercase">{{ it.ref }} · Taille {{ it.size }}</div>
+                  <div style="display:flex;align-items:center;gap:12px;margin-top:auto;flex-wrap:wrap">
+                    <div style="display:flex;align-items:center;border:1px solid rgba(255,255,255,.16)">
+                      <button onClick="{{ it.dec }}" style="background:transparent;border:0;color:#F5F5F5;padding:5px 10px;cursor:pointer;font-size:14px">−</button>
+                      <span style="min-width:24px;text-align:center;font-size:13px">{{ it.qty }}</span>
+                      <button onClick="{{ it.inc }}" style="background:transparent;border:0;color:#F5F5F5;padding:5px 10px;cursor:pointer;font-size:14px">+</button>
+                    </div>
+                    <span style="font-family:Jost,sans-serif;font-weight:600;font-size:14px;color:#C39C6C">{{ it.line }}</span>
+                    <button onClick="{{ it.remove }}" style="background:transparent;border:0;color:rgba(255,255,255,.4);font-size:10px;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;margin-left:auto" style-hover="color:#F5F5F5">Retirer</button>
+                  </div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="border:1px solid rgba(255,255,255,.10);background:#111111;padding:22px;display:flex;flex-direction:column;gap:16px">
+            <span style="font-size:10px;letter-spacing:.24em;color:#C39C6C;text-transform:uppercase">Récapitulatif</span>
+            <div style="display:flex;flex-direction:column;gap:9px;font-size:13px;color:rgba(255,255,255,.6)">
+              <div style="display:flex;justify-content:space-between;gap:12px"><span>Sous-total</span><span style="color:#F5F5F5">{{ subtotal }}</span></div>
+              <div style="display:flex;justify-content:space-between;gap:12px"><span>Livraison ({{ country }})</span><span style="color:#F5F5F5">{{ shipping }}</span></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <span style="font-size:10px;letter-spacing:.2em;color:rgba(255,255,255,.35);text-transform:uppercase">Pays de livraison</span>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <sc-for list="{{ countryChips }}" as="c" hint-placeholder-count="3">
+                  <button onClick="{{ c.go }}" style="{{ c.style }}" style-hover="border-color:#C39C6C;color:#F5F5F5">{{ c.label }}</button>
+                </sc-for>
+              </div>
+            </div>
+            <div style="border-top:1px solid rgba(255,255,255,.10);padding-top:16px;display:flex;justify-content:space-between;align-items:flex-end;gap:12px">
+              <span style="font-size:11px;letter-spacing:.2em;color:rgba(255,255,255,.5);text-transform:uppercase">Total</span>
+              <div style="text-align:right">
+                <div style="font-family:Jost,sans-serif;font-weight:600;font-size:24px;color:#C39C6C;letter-spacing:-.02em">{{ total }}</div>
+                <div style="font-size:11px;color:rgba(255,255,255,.45);margin-top:3px">{{ totalChf }}</div>
+              </div>
+            </div>
+            <button onClick="{{ goCheckout }}" style="background:#C39C6C;border:1px solid #C39C6C;color:#060606;font-family:Jost,sans-serif;font-weight:600;font-size:12px;letter-spacing:.16em;text-transform:uppercase;padding:17px 22px;cursor:pointer;transition:background .4s cubic-bezier(.32,.94,.6,1),color .4s cubic-bezier(.32,.94,.6,1)" style-hover="background:#060606;color:#C39C6C">Payer par virement</button>
+            <span style="font-size:11px;color:rgba(255,255,255,.4);text-wrap:pretty">Seul moyen de paiement accepté : le virement bancaire. Les coordonnées du compte s'affichent à l'étape suivante.</span>
+          </div>
+        </div>
+      </sc-if>
+    </section>
+  </sc-if>
+
+  <sc-if value="{{ isCheckout }}" hint-placeholder-val="{{ false }}">
+    <section style="max-width:1000px;margin:0 auto;padding:32px 22px 80px">
+      <div style="display:flex;gap:9px;align-items:center;font-size:11px;letter-spacing:.16em;color:rgba(255,255,255,.5);text-transform:uppercase;margin-bottom:18px;flex-wrap:wrap">
+        <span onClick="{{ goCart }}" style="cursor:pointer" style-hover="color:#C39C6C">Panier</span>
+        <span style="color:#3a3a3a">/</span><span style="color:#C39C6C">Paiement par virement</span>
+      </div>
+      <h1 style="font-family:Jost,sans-serif;font-weight:600;font-size:clamp(24px,4.8vw,40px);letter-spacing:-.03em;margin:0;text-transform:uppercase">{{ stepTitle }}</h1>
+      <div style="display:flex;gap:8px;margin:20px 0 30px">
+        <sc-for list="{{ steps }}" as="s" hint-placeholder-count="3">
+          <div style="{{ s.style }}"></div>
+        </sc-for>
+      </div>
+
+      <sc-if value="{{ isStep1 }}" hint-placeholder-val="{{ true }}">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:16px;max-width:720px">
+          <label style="display:flex;flex-direction:column;gap:7px">
+            <span style="font-size:10px;letter-spacing:.2em;color:rgba(255,255,255,.4);text-transform:uppercase">Nom et prénom</span>
+            <input value="{{ f.name }}" onChange="{{ f.setName }}" placeholder="Alex Dupont" style="background:#111111;border:1px solid rgba(255,255,255,.16);color:#F5F5F5;padding:13px;font-size:14px;outline:0"/>
+          </label>
+          <label style="display:flex;flex-direction:column;gap:7px">
+            <span style="font-size:10px;letter-spacing:.2em;color:rgba(255,255,255,.4);text-transform:uppercase">Email</span>
+            <input value="{{ f.email }}" onChange="{{ f.setEmail }}" placeholder="alex@email.com" style="background:#111111;border:1px solid rgba(255,255,255,.16);color:#F5F5F5;padding:13px;font-size:14px;outline:0"/>
+          </label>
+          <label style="display:flex;flex-direction:column;gap:7px">
+            <span style="font-size:10px;letter-spacing:.2em;color:rgba(255,255,255,.4);text-transform:uppercase">Téléphone</span>
+            <input value="{{ f.phone }}" onChange="{{ f.setPhone }}" placeholder="+33 6 12 34 56 78" style="background:#111111;border:1px solid rgba(255,255,255,.16);color:#F5F5F5;padding:13px;font-size:14px;outline:0"/>
+          </label>
+          <label style="display:flex;flex-direction:column;gap:7px">
+            <span style="font-size:10px;letter-spacing:.2em;color:rgba(255,255,255,.4);text-transform:uppercase">Ville et code postal</span>
+            <input value="{{ f.city }}" onChange="{{ f.setCity }}" placeholder="75011 Paris" style="background:#111111;border:1px solid rgba(255,255,255,.16);color:#F5F5F5;padding:13px;font-size:14px;outline:0"/>
+          </label>
+          <label style="display:flex;flex-direction:column;gap:7px;grid-column:1/-1">
+            <span style="font-size:10px;letter-spacing:.2em;color:rgba(255,255,255,.4);text-transform:uppercase">Adresse de livraison</span>
+            <input value="{{ f.addr }}" onChange="{{ f.setAddr }}" placeholder="12 rue de la Roquette" style="background:#111111;border:1px solid rgba(255,255,255,.16);color:#F5F5F5;padding:13px;font-size:14px;outline:0"/>
+          </label>
+          <div style="grid-column:1/-1;display:flex;flex-direction:column;gap:9px">
+            <span style="font-size:10px;letter-spacing:.2em;color:rgba(255,255,255,.4);text-transform:uppercase">Pays</span>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <sc-for list="{{ countryChips }}" as="c" hint-placeholder-count="3">
+                <button onClick="{{ c.go }}" style="{{ c.style }}" style-hover="border-color:#C39C6C;color:#F5F5F5">{{ c.label }}</button>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:center;margin-top:28px;flex-wrap:wrap">
+          <button onClick="{{ toStep2 }}" style="background:#C39C6C;border:1px solid #C39C6C;color:#060606;font-family:Jost,sans-serif;font-weight:600;font-size:12px;letter-spacing:.16em;text-transform:uppercase;padding:16px 24px;cursor:pointer;transition:background .4s cubic-bezier(.32,.94,.6,1),color .4s cubic-bezier(.32,.94,.6,1)" style-hover="background:#060606;color:#C39C6C">Afficher les coordonnées bancaires</button>
+          <sc-if value="{{ err }}" hint-placeholder-val="{{ false }}">
+            <span style="font-size:11px;letter-spacing:.14em;color:#C39C6C;text-transform:uppercase">{{ err }}</span>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isStep2 }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,290px),1fr));gap:22px;align-items:start">
+          <div style="border:1px solid #C39C6C;background:linear-gradient(#111111,#101010);padding:22px;display:flex;flex-direction:column;gap:16px">
+            <span style="font-size:10px;letter-spacing:.24em;color:#C39C6C;text-transform:uppercase">Coordonnées du compte</span>
+            <sc-for list="{{ bank }}" as="b" hint-placeholder-count="5">
+              <div style="display:flex;flex-direction:column;gap:4px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:11px">
+                <span style="font-size:10px;letter-spacing:.2em;color:rgba(255,255,255,.4);text-transform:uppercase">{{ b.label }}</span>
+                <span style="{{ b.valStyle }}">{{ b.value }}</span>
+              </div>
+            </sc-for>
+            <span style="font-size:11px;color:rgba(255,255,255,.45);text-wrap:pretty">Indique impérativement la référence <span style="color:#C39C6C">{{ orderRef }}</span> dans le libellé du virement, sinon la commande ne peut pas être rattachée.</span>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:18px">
+            <div style="border:1px solid rgba(255,255,255,.10);background:#111111;padding:20px;display:flex;flex-direction:column;gap:12px">
+              <span style="font-size:10px;letter-spacing:.24em;color:rgba(255,255,255,.4);text-transform:uppercase">Preuve de paiement</span>
+              <span style="font-size:12px;color:rgba(255,255,255,.55);text-wrap:pretty">Joins la capture ou le PDF de l'ordre de virement. La commande passe en attente de vérification.</span>
+              <input type="file" accept="image/*,application/pdf" onChange="{{ onProof }}" style="font-size:12px;color:rgba(255,255,255,.6)"/>
+              <sc-if value="{{ proofImg }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;gap:12px;align-items:center;border:1px solid rgba(195,156,108,.5);padding:10px">
+                  <img src="{{ proofImg }}" alt="preuve" style="width:52px;height:52px;object-fit:cover"/>
+                  <span style="font-size:11px;letter-spacing:.14em;color:#C39C6C;text-transform:uppercase">Preuve jointe</span>
+                </div>
+              </sc-if>
+              <sc-if value="{{ proofPdf }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;gap:12px;align-items:center;border:1px solid rgba(195,156,108,.5);padding:12px">
+                  <span style="width:34px;height:44px;border:1px solid #C39C6C;color:#C39C6C;font-size:9px;font-weight:700;letter-spacing:.06em;display:flex;align-items:center;justify-content:center;flex:0 0 auto">PDF</span>
+                  <span style="display:flex;flex-direction:column;gap:3px;min-width:0">
+                    <span style="font-size:11px;letter-spacing:.14em;color:#C39C6C;text-transform:uppercase">Preuve jointe</span>
+                    <span style="font-size:11px;color:rgba(255,255,255,.5);overflow:hidden;text-overflow:ellipsis">{{ proofName }}</span>
+                  </span>
+                </div>
+              </sc-if>
+            </div>
+
+            <div style="border:1px solid rgba(255,255,255,.10);background:#111111;padding:20px;display:flex;flex-direction:column;gap:11px">
+              <span style="font-size:10px;letter-spacing:.24em;color:rgba(255,255,255,.4);text-transform:uppercase">Commande</span>
+              <div style="display:flex;justify-content:space-between;gap:12px;font-size:13px;color:rgba(255,255,255,.6)"><span>{{ cartCount }} article(s)</span><span style="color:#F5F5F5">{{ subtotal }}</span></div>
+              <div style="display:flex;justify-content:space-between;gap:12px;font-size:13px;color:rgba(255,255,255,.6)"><span>Livraison {{ country }}</span><span style="color:#F5F5F5">{{ shipping }}</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;border-top:1px solid rgba(255,255,255,.10);padding-top:12px">
+                <span style="font-size:11px;letter-spacing:.2em;color:rgba(255,255,255,.5);text-transform:uppercase">À virer</span>
+                <span style="font-family:Jost,sans-serif;font-weight:600;font-size:22px;color:#C39C6C">{{ total }}</span>
+              </div>
+            </div>
+
+            <button onClick="{{ confirmPayment }}" style="background:#C39C6C;border:1px solid #C39C6C;color:#060606;font-family:Jost,sans-serif;font-weight:600;font-size:12px;letter-spacing:.16em;text-transform:uppercase;padding:17px 24px;cursor:pointer;transition:background .4s cubic-bezier(.32,.94,.6,1),color .4s cubic-bezier(.32,.94,.6,1)" style-hover="background:#060606;color:#C39C6C">J'ai effectué le virement · confirmer</button>
+            <sc-if value="{{ err }}" hint-placeholder-val="{{ false }}">
+              <span style="font-size:11px;letter-spacing:.14em;color:#C39C6C;text-transform:uppercase">{{ err }}</span>
+            </sc-if>
+            <button onClick="{{ backStep1 }}" style="background:transparent;border:0;color:rgba(255,255,255,.4);font-size:11px;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;align-self:flex-start" style-hover="color:#F5F5F5">← Modifier mes coordonnées</button>
+          </div>
+        </div>
+      </sc-if>
+    </section>
+  </sc-if>
+
+  <sc-if value="{{ isDone }}" hint-placeholder-val="{{ false }}">
+    <section style="max-width:760px;margin:0 auto;padding:60px 22px 100px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px">
+      <span style="width:54px;height:54px;border:1px solid #C39C6C;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#C39C6C;font-size:20px">✓</span>
+      <h1 style="font-family:Jost,sans-serif;font-weight:600;font-size:clamp(24px,5vw,40px);letter-spacing:-.03em;margin:8px 0 0;text-transform:uppercase">Paiement déclaré</h1>
+      <p style="color:rgba(255,255,255,.6);font-size:14px;max-width:460px;text-wrap:pretty">Ta commande <span style="color:#C39C6C">{{ lastRef }}</span> est en attente de vérification. Les fonds restent en séquestre jusqu'à la livraison — garde cette référence, elle sert à suivre le colis.</p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:10px">
+        <button onClick="{{ goTrack }}" style="background:#C39C6C;border:0;color:#060606;font-family:Jost,sans-serif;font-weight:600;font-size:12px;letter-spacing:.16em;text-transform:uppercase;padding:15px 22px;cursor:pointer">Suivre ma commande</button>
+        <button onClick="{{ goHome }}" style="background:transparent;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);font-size:11px;letter-spacing:.16em;text-transform:uppercase;padding:15px 22px;cursor:pointer" style-hover="color:#F5F5F5;border-color:rgba(255,255,255,.5)">Retour au catalogue</button>
+      </div>
+    </section>
+  </sc-if>
+
+  <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ false }}">
+    <section style="max-width:1400px;margin:0 auto;padding:32px 22px 80px">
+      <sc-if value="{{ needsLogin }}" hint-placeholder-val="{{ true }}">
+        <div style="max-width:400px;margin:40px auto;border:1px solid rgba(255,255,255,.10);background:#111111;padding:28px;display:flex;flex-direction:column;gap:16px">
+          <span style="font-size:10px;letter-spacing:.24em;color:#C39C6C;text-transform:uppercase">Espace administrateur</span>
+          <h1 style="font-family:Jost,sans-serif;font-weight:600;font-size:24px;margin:0;text-transform:uppercase;letter-spacing:-.02em">Connexion</h1>
+          <input value="{{ codeInput }}" onChange="{{ setCode }}" placeholder="Code d'accès" style="background:#0F0F0F;border:1px solid rgba(255,255,255,.16);color:#F5F5F5;padding:13px;font-size:14px;outline:0;letter-spacing:.2em"/>
+          <button onClick="{{ login }}" style="background:#C39C6C;border:0;color:#060606;font-family:Jost,sans-serif;font-weight:600;font-size:12px;letter-spacing:.16em;text-transform:uppercase;padding:15px;cursor:pointer">Entrer</button>
+          <span style="font-size:11px;color:rgba(255,255,255,.4)">Démo : code <span style="color:#C39C6C">NOVA</span> — à remplacer par une vraie authentification.</span>
+          <sc-if value="{{ loginErr }}" hint-placeholder-val="{{ false }}">
+            <span style="font-size:11px;letter-spacing:.14em;color:#C39C6C;text-transform:uppercase">Code incorrect</span>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ adminIn }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;border-bottom:1px solid rgba(255,255,255,.10);padding-bottom:16px">
+          <div>
+            <span style="font-size:10px;letter-spacing:.24em;color:#C39C6C;text-transform:uppercase">Espace administrateur</span>
+            <h1 style="font-family:Jost,sans-serif;font-weight:600;font-size:clamp(24px,4.6vw,38px);margin:10px 0 0;text-transform:uppercase;letter-spacing:-.03em">Back-office</h1>
+          </div>
+          <div style="display:flex;gap:9px;flex-wrap:wrap">
+            <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="2">
+              <button onClick="{{ t.go }}" style="{{ t.style }}" style-hover="border-color:#C39C6C;color:#F5F5F5">{{ t.label }}</button>
+            </sc-for>
+            <button onClick="{{ logout }}" style="background:transparent;border:1px solid rgba(255,255,255,.16);color:rgba(255,255,255,.45);font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;padding:8px 13px;cursor:pointer" style-hover="color:#F5F5F5">Quitter</button>
+          </div>
+        </div>
+
+        <sc-if value="{{ tabOrders }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;gap:14px;flex-wrap:wrap;margin:22px 0 24px">
+            <sc-for list="{{ stats }}" as="s" hint-placeholder-count="4">
+              <div style="border:1px solid rgba(255,255,255,.10);background:#111111;padding:15px 20px;min-width:140px">
+                <div style="font-size:10px;letter-spacing:.2em;color:rgba(255,255,255,.4);text-transform:uppercase">{{ s.label }}</div>
+                <div style="font-family:Jost,sans-serif;font-weight:600;font-size:26px;margin-top:8px;color:#F5F5F5">{{ s.value }}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <sc-if value="{{ noOrders }}" hint-placeholder-val="{{ false }}">
+            <div style="border:1px solid rgba(255,255,255,.10);padding:50px 24px;text-align:center;color:rgba(255,255,255,.5);font-size:13px">Aucune commande pour le moment. Passe une commande côté boutique pour la voir apparaître ici.</div>
+          </sc-if>
+
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <sc-for list="{{ orders }}" as="o" hint-placeholder-count="2">
+              <div style="border:1px solid rgba(255,255,255,.10);background:#111111">
+                <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;padding:16px 18px;border-bottom:1px solid rgba(255,255,255,.08)">
+                  <div style="display:flex;flex-direction:column;gap:4px;min-width:170px">
+                    <span style="font-family:Jost,sans-serif;font-weight:600;font-size:14px;color:#C39C6C">{{ o.ref }}</span>
+                    <span style="font-size:11px;color:rgba(255,255,255,.45)">{{ o.date }}</span>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:4px;min-width:170px">
+                    <span style="font-size:13px;color:#F5F5F5">{{ o.customerName }}</span>
+                    <span style="font-size:11px;color:rgba(255,255,255,.45)">{{ o.customerLine }}</span>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:4px;min-width:110px">
+                    <span style="font-size:11px;letter-spacing:.16em;color:rgba(255,255,255,.35);text-transform:uppercase">Montant</span>
+                    <span style="font-family:Jost,sans-serif;font-weight:600;font-size:15px;color:#F5F5F5">{{ o.total }}</span>
+                  </div>
+                  <span style="{{ o.statusStyle }}">{{ o.statusLabel }}</span>
+                  <button onClick="{{ o.toggle }}" style="margin-left:auto;background:transparent;border:1px solid rgba(255,255,255,.16);color:rgba(255,255,255,.6);font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;padding:9px 14px;cursor:pointer" style-hover="color:#F5F5F5;border-color:#C39C6C">{{ o.toggleLabel }}</button>
+                </div>
+
+                <sc-if value="{{ o.open }}" hint-placeholder-val="{{ false }}">
+                  <div style="padding:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:22px">
+                    <div style="display:flex;flex-direction:column;gap:12px">
+                      <span style="font-size:10px;letter-spacing:.24em;color:rgba(255,255,255,.4);text-transform:uppercase">Articles</span>
+                      <sc-for list="{{ o.items }}" as="it" hint-placeholder-count="2">
+                        <div style="display:flex;gap:11px;align-items:center">
+                          <img src="{{ it.img }}" alt="{{ it.name }}" style="width:44px;height:55px;object-fit:cover;flex:0 0 auto"/>
+                          <div style="display:flex;flex-direction:column;gap:3px;min-width:0">
+                            <span style="font-size:12px;font-weight:700;text-transform:uppercase">{{ it.name }}</span>
+                            <span style="font-size:11px;color:rgba(255,255,255,.45)">{{ it.meta }}</span>
+                          </div>
+                          <span style="margin-left:auto;font-size:13px;color:#C39C6C;font-weight:700">{{ it.line }}</span>
+                        </div>
+                      </sc-for>
+                      <div style="border-top:1px solid rgba(255,255,255,.08);padding-top:11px;display:flex;flex-direction:column;gap:6px;font-size:12px;color:rgba(255,255,255,.55)">
+                        <div style="display:flex;justify-content:space-between;gap:10px"><span>Livraison</span><span style="color:#F5F5F5">{{ o.shipping }}</span></div>
+                        <div style="display:flex;justify-content:space-between;gap:10px"><span>Adresse</span><span style="color:#F5F5F5;text-align:right">{{ o.address }}</span></div>
+                        <div style="display:flex;justify-content:space-between;gap:10px"><span>Référence virement</span><span style="color:#C39C6C">{{ o.ref }}</span></div>
+                      </div>
+                    </div>
+
+                    <div style="display:flex;flex-direction:column;gap:12px">
+                      <span style="font-size:10px;letter-spacing:.24em;color:rgba(255,255,255,.4);text-transform:uppercase">Preuve de paiement</span>
+                      <sc-if value="{{ o.proofImg }}" hint-placeholder-val="{{ false }}">
+                        <img src="{{ o.proofImg }}" alt="preuve de paiement" style="width:100%;max-height:300px;object-fit:contain;border:1px solid rgba(255,255,255,.12);background:#0F0F0F"/>
+                      </sc-if>
+                      <sc-if value="{{ o.proofPdf }}" hint-placeholder-val="{{ false }}">
+                        <div style="display:flex;gap:13px;align-items:center;border:1px solid rgba(255,255,255,.12);background:#0F0F0F;padding:16px">
+                          <span style="width:40px;height:52px;border:1px solid #C39C6C;color:#C39C6C;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:0 0 auto">PDF</span>
+                          <span style="display:flex;flex-direction:column;gap:5px;min-width:0">
+                            <span style="font-size:12px;color:#F5F5F5;overflow:hidden;text-overflow:ellipsis">{{ o.proofName }}</span>
+                            <a href="{{ o.proofPdf }}" target="_blank" rel="noopener" style="font-size:10px;letter-spacing:.16em;text-transform:uppercase">Ouvrir le justificatif →</a>
+                          </span>
+                        </div>
+                      </sc-if>
+                      <sc-if value="{{ o.noProof }}" hint-placeholder-val="{{ false }}">
+                        <span style="font-size:12px;color:rgba(255,255,255,.45);border:1px dashed rgba(255,255,255,.16);padding:20px;text-align:center">Aucune preuve jointe par le client.</span>
+                      </sc-if>
+
+                      <sc-if value="{{ o.actionable }}" hint-placeholder-val="{{ false }}">
+                        <div style="display:flex;flex-direction:column;gap:10px;border-top:1px solid rgba(255,255,255,.08);padding-top:14px">
+                          <button onClick="{{ o.validate }}" style="background:#C39C6C;border:0;color:#060606;font-family:Jost,sans-serif;font-weight:600;font-size:11px;letter-spacing:.16em;text-transform:uppercase;padding:14px;cursor:pointer">Valider le paiement</button>
+                          <span style="font-size:10px;letter-spacing:.2em;color:rgba(255,255,255,.35);text-transform:uppercase;margin-top:4px">Rejeter — motif obligatoire</span>
+                          <div style="display:flex;gap:7px;flex-wrap:wrap">
+                            <sc-for list="{{ o.reasonChips }}" as="r" hint-placeholder-count="3">
+                              <button onClick="{{ r.go }}" style="{{ r.style }}" style-hover="border-color:#C39C6C;color:#F5F5F5">{{ r.label }}</button>
+                            </sc-for>
+                          </div>
+                          <textarea value="{{ o.reasonText }}" onChange="{{ o.setReason }}" placeholder="Préciser le motif communiqué au client…" rows="2" style="background:#0F0F0F;border:1px solid rgba(255,255,255,.16);color:#F5F5F5;padding:11px;font-size:13px;outline:0;resize:vertical"></textarea>
+                          <button onClick="{{ o.reject }}" style="background:transparent;border:1px solid rgba(255,255,255,.24);color:#F5F5F5;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;padding:13px;cursor:pointer" style-hover="border-color:#C39C6C;color:#C39C6C">Rejeter la commande</button>
+                          <sc-if value="{{ o.reasonErr }}" hint-placeholder-val="{{ false }}">
+                            <span style="font-size:11px;letter-spacing:.14em;color:#C39C6C;text-transform:uppercase">Indique un motif avant de rejeter</span>
+                          </sc-if>
+                        </div>
+                      </sc-if>
+
+                      <sc-if value="{{ o.isValid }}" hint-placeholder-val="{{ false }}">
+                        <div style="border-top:1px solid rgba(255,255,255,.08);padding-top:14px;display:flex;flex-direction:column;gap:11px">
+                          <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline">
+                            <span style="font-size:10px;letter-spacing:.2em;color:rgba(255,255,255,.35);text-transform:uppercase">Étape de livraison</span>
+                            <span style="font-size:9px;letter-spacing:.16em;color:#C39C6C;text-transform:uppercase">{{ o.escrowLine }}</span>
+                          </div>
+                          <span style="font-family:Jost,sans-serif;font-weight:600;font-size:14px;text-transform:uppercase;color:#C39C6C">{{ o.stageTitle }}</span>
+                          <span style="font-size:12px;color:rgba(255,255,255,.55);text-wrap:pretty">{{ o.stageDesc }}</span>
+                          <div style="display:flex;gap:7px;flex-wrap:wrap">
+                            <sc-for list="{{ o.stageChips }}" as="s" hint-placeholder-count="5">
+                              <button onClick="{{ s.go }}" style="{{ s.style }}" style-hover="border-color:#C39C6C;color:#F5F5F5">{{ s.label }}</button>
+                            </sc-for>
+                          </div>
+                          <sc-if value="{{ o.canAdvance }}" hint-placeholder-val="{{ true }}">
+                            <button onClick="{{ o.advance }}" style="background:#C39C6C;border:0;color:#060606;font-family:Jost,sans-serif;font-weight:600;font-size:11px;letter-spacing:.16em;text-transform:uppercase;padding:13px;cursor:pointer">Passer à l'étape suivante</button>
+                          </sc-if>
+                        </div>
+                      </sc-if>
+
+                      <sc-if value="{{ o.decided }}" hint-placeholder-val="{{ false }}">
+                        <div style="border-top:1px solid rgba(255,255,255,.08);padding-top:14px;display:flex;flex-direction:column;gap:8px">
+                          <span style="font-size:12px;color:rgba(255,255,255,.6)">{{ o.decisionLine }}</span>
+                          <button onClick="{{ o.reopen }}" style="background:transparent;border:0;border-bottom:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.45);font-size:10px;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;padding:3px 0;align-self:flex-start" style-hover="color:#C39C6C;border-color:#C39C6C">Remettre en attente</button>
+                        </div>
+                      </sc-if>
+                    </div>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ tabBank }}" hint-placeholder-val="{{ false }}">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,290px),1fr));gap:26px;margin-top:24px;align-items:start;max-width:900px">
+            <div style="border:1px solid rgba(255,255,255,.10);background:#111111;padding:22px;display:flex;flex-direction:column;gap:14px">
+              <span style="font-size:10px;letter-spacing:.24em;color:#C39C6C;text-transform:uppercase">Compte de réception des virements</span>
+              <span style="font-size:12px;color:rgba(255,255,255,.5);text-wrap:pretty">Ces informations s'affichent au client à l'étape de paiement. La référence de commande est générée automatiquement.</span>
+              <sc-for list="{{ bankForm.fields }}" as="b" hint-placeholder-count="4">
+                <label style="display:flex;flex-direction:column;gap:6px">
+                  <span style="font-size:10px;letter-spacing:.2em;color:rgba(255,255,255,.4);text-transform:uppercase">{{ b.label }}</span>
+                  <input value="{{ b.value }}" onChange="{{ b.set }}" placeholder="{{ b.placeholder }}" style="background:#0F0F0F;border:1px solid rgba(255,255,255,.16);color:#F5F5F5;padding:12px;font-size:13px;outline:0;letter-spacing:.02em"/>
+                </label>
+              </sc-for>
+              <button onClick="{{ bankForm.save }}" style="background:#C39C6C;border:0;color:#060606;font-family:Jost,sans-serif;font-weight:600;font-size:11px;letter-spacing:.16em;text-transform:uppercase;padding:14px;cursor:pointer">Enregistrer les coordonnées</button>
+              <sc-if value="{{ bankForm.msg }}" hint-placeholder-val="{{ false }}">
+                <span style="font-size:11px;letter-spacing:.14em;color:#C39C6C;text-transform:uppercase">{{ bankForm.msg }}</span>
+              </sc-if>
+              <button onClick="{{ bankForm.reset }}" style="background:transparent;border:0;border-bottom:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.45);font-size:10px;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;padding:3px 0;align-self:flex-start" style-hover="color:#C39C6C;border-color:#C39C6C">Revenir aux valeurs de démo</button>
+            </div>
+
+            <div style="border:1px solid #C39C6C;background:linear-gradient(#111111,#101010);padding:22px;display:flex;flex-direction:column;gap:14px">
+              <span style="font-size:10px;letter-spacing:.24em;color:#C39C6C;text-transform:uppercase">Aperçu côté client</span>
+              <sc-for list="{{ bankForm.preview }}" as="b" hint-placeholder-count="4">
+                <div style="display:flex;flex-direction:column;gap:4px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:11px">
+                  <span style="font-size:10px;letter-spacing:.2em;color:rgba(255,255,255,.4);text-transform:uppercase">{{ b.label }}</span>
+                  <span style="font-size:14px;color:#F5F5F5;word-break:break-word">{{ b.value }}</span>
+                </div>
+              </sc-for>
+              <div style="display:flex;flex-direction:column;gap:4px">
+                <span style="font-size:10px;letter-spacing:.2em;color:rgba(255,255,255,.4);text-transform:uppercase">Référence à indiquer</span>
+                <span style="font-family:Jost,sans-serif;font-weight:600;font-size:15px;color:#C39C6C">NW-2026-XXXX</span>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ tabProducts }}" hint-placeholder-val="{{ false }}">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:26px;margin-top:24px;align-items:start">
+            <div style="border:1px solid rgba(255,255,255,.10);background:#111111;padding:20px;display:flex;flex-direction:column;gap:14px">
+              <span style="font-size:10px;letter-spacing:.24em;color:#C39C6C;text-transform:uppercase">Ajouter un article</span>
+              <label style="display:flex;flex-direction:column;gap:6px">
+                <span style="font-size:10px;letter-spacing:.2em;color:rgba(255,255,255,.4);text-transform:uppercase">Nom</span>
+                <input value="{{ np.name }}" onChange="{{ np.setName }}" placeholder="HOODIE ONYX" style="background:#0F0F0F;border:1px solid rgba(255,255,255,.16);color:#F5F5F5;padding:11px;font-size:13px;outline:0"/>
+              </label>
+              <div style="display:flex;gap:10px;flex-wrap:wrap">
+                <label style="display:flex;flex-direction:column;gap:6px;flex:1 1 130px">
+                  <span style="font-size:10px;letter-spacing:.2em;color:rgba(255,255,255,.4);text-transform:uppercase">Catégorie</span>
+                  <select value="{{ np.cat }}" onChange="{{ np.setCat }}" style="background:#0F0F0F;border:1px solid rgba(255,255,255,.16);color:#F5F5F5;padding:11px;font-size:13px;outline:0">
+                    <sc-for list="{{ np.catOptions }}" as="o" hint-placeholder-count="7">
+                      <option value="{{ o.value }}">{{ o.label }}</option>
+                    </sc-for>
+                  </select>
+                </label>
+                <label style="display:flex;flex-direction:column;gap:6px;flex:1 1 130px">
+                  <span style="font-size:10px;letter-spacing:.2em;color:rgba(255,255,255,.4);text-transform:uppercase">Sous-catégorie</span>
+                  <select value="{{ np.sub }}" onChange="{{ np.setSub }}" style="background:#0F0F0F;border:1px solid rgba(255,255,255,.16);color:#F5F5F5;padding:11px;font-size:13px;outline:0">
+                    <sc-for list="{{ np.subOptions }}" as="o" hint-placeholder-count="4">
+                      <option value="{{ o.value }}">{{ o.label }}</option>
+                    </sc-for>
+                  </select>
+                </label>
+              </div>
+              <div style="display:flex;gap:10px;flex-wrap:wrap">
+                <label style="display:flex;flex-direction:column;gap:6px;flex:1 1 110px">
+                  <span style="font-size:10px;letter-spacing:.2em;color:rgba(255,255,255,.4);text-transform:uppercase">Prix €</span>
+                  <input value="{{ np.price }}" onChange="{{ np.setPrice }}" placeholder="89,90" style="background:#0F0F0F;border:1px solid rgba(255,255,255,.16);color:#F5F5F5;padding:11px;font-size:13px;outline:0"/>
+                </label>
+                <label style="display:flex;flex-direction:column;gap:6px;flex:1 1 150px">
+                  <span style="font-size:10px;letter-spacing:.2em;color:rgba(255,255,255,.4);text-transform:uppercase">Tailles (séparées par /)</span>
+                  <input value="{{ np.sizes }}" onChange="{{ np.setSizes }}" placeholder="S / M / L / XL" style="background:#0F0F0F;border:1px solid rgba(255,255,255,.16);color:#F5F5F5;padding:11px;font-size:13px;outline:0"/>
+                </label>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <span style="font-size:10px;letter-spacing:.2em;color:rgba(255,255,255,.4);text-transform:uppercase">Badge</span>
+                <div style="display:flex;gap:7px;flex-wrap:wrap">
+                  <sc-for list="{{ np.badgeChips }}" as="b" hint-placeholder-count="4">
+                    <button onClick="{{ b.go }}" style="{{ b.style }}" style-hover="border-color:#C39C6C;color:#F5F5F5">{{ b.label }}</button>
+                  </sc-for>
+                </div>
+              </div>
+              <label style="display:flex;flex-direction:column;gap:7px">
+                <span style="font-size:10px;letter-spacing:.2em;color:rgba(255,255,255,.4);text-transform:uppercase">Photo (ratio 4:5)</span>
+                <input type="file" accept="image/*" onChange="{{ np.onPhoto }}" style="font-size:12px;color:rgba(255,255,255,.6)"/>
+              </label>
+              <sc-if value="{{ np.photo }}" hint-placeholder-val="{{ false }}">
+                <img src="{{ np.photo }}" alt="aperçu" style="width:96px;aspect-ratio:4/5;object-fit:cover;border:1px solid rgba(195,156,108,.5)"/>
+              </sc-if>
+              <button onClick="{{ np.submit }}" style="background:#C39C6C;border:0;color:#060606;font-family:Jost,sans-serif;font-weight:600;font-size:11px;letter-spacing:.16em;text-transform:uppercase;padding:14px;cursor:pointer">Ajouter au catalogue</button>
+              <sc-if value="{{ np.msg }}" hint-placeholder-val="{{ false }}">
+                <span style="font-size:11px;letter-spacing:.14em;color:#C39C6C;text-transform:uppercase">{{ np.msg }}</span>
+              </sc-if>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap">
+                <span style="font-size:10px;letter-spacing:.24em;color:#C39C6C;text-transform:uppercase">Catalogue · {{ totalCount }} articles</span>
+                <sc-if value="{{ hasRemoved }}" hint-placeholder-val="{{ false }}">
+                  <button onClick="{{ restoreAll }}" style="background:transparent;border:0;border-bottom:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.45);font-size:10px;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;padding:3px 0" style-hover="color:#C39C6C;border-color:#C39C6C">{{ restoreLabel }}</button>
+                </sc-if>
+              </div>
+              <div style="display:flex;align-items:center;gap:9px;border:1px solid rgba(255,255,255,.16);background:#0F0F0F;padding:10px 13px">
+                <input value="{{ adminQ }}" onChange="{{ setAdminQ }}" placeholder="Filtrer par nom, référence ou sous-catégorie…" style="flex:1;min-width:0;background:transparent;border:0;outline:0;color:#F5F5F5;font-size:13px"/>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:9px;max-height:620px;overflow-y:auto;padding-right:4px">
+                <sc-for list="{{ adminProducts }}" as="p" hint-placeholder-count="6">
+                  <div style="display:flex;gap:12px;align-items:center;border:1px solid rgba(255,255,255,.10);background:#111111;padding:10px">
+                    <img src="{{ p.img }}" alt="{{ p.name }}" loading="lazy" style="width:44px;height:55px;object-fit:cover;flex:0 0 auto"/>
+                    <div style="display:flex;flex-direction:column;gap:3px;min-width:0;flex:1">
+                      <span style="font-size:12px;font-weight:700;text-transform:uppercase;line-height:1.2">{{ p.name }}</span>
+                      <span style="font-size:10px;letter-spacing:.14em;color:rgba(255,255,255,.45);text-transform:uppercase">{{ p.ref }} · {{ p.crumb }}</span>
+                    </div>
+                    <span style="font-size:13px;color:#C39C6C;font-weight:700;flex:0 0 auto">{{ p.eur }}</span>
+                    <button onClick="{{ p.remove }}" style="background:transparent;border:1px solid rgba(255,255,255,.16);color:rgba(255,255,255,.5);font-size:10px;letter-spacing:.16em;text-transform:uppercase;padding:8px 11px;cursor:pointer;flex:0 0 auto" style-hover="border-color:#C39C6C;color:#C39C6C">Supprimer</button>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+      </sc-if>
+    </section>
+  </sc-if>
+
+  <footer style="border-top:1px solid rgba(255,255,255,.10);background:#0d0d0d">
+    <div style="max-width:1400px;margin:0 auto;padding:52px 22px 28px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,215px),1fr));gap:34px">
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <img src="./assets/novawear-logo.png" alt="NOVAWEAR" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:1px solid rgba(255,255,255,.2)"/>
+          <span style="font-family:Jost,sans-serif;font-weight:600;font-size:15px;letter-spacing:.22em">NOVA<span style="color:#C39C6C">WEAR</span></span>
+        </div>
+        <span style="font-size:11px;letter-spacing:.3em;color:rgba(255,255,255,.5);text-transform:uppercase">Style. Confidence. Nova.</span>
+        <span style="font-size:11px;color:rgba(255,255,255,.35);text-wrap:pretty">Paiement par virement bancaire uniquement. Commande expédiée après vérification du virement.</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:9px;font-size:13px;color:rgba(255,255,255,.55)">
+        <span style="font-size:10px;letter-spacing:.24em;color:#C39C6C;text-transform:uppercase;margin-bottom:5px">Livraison France</span>
+        <span>Colissimo suivi · 48 h</span><span>Offerte dès 60 €</span><span>Retour 14 jours</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:9px;font-size:13px;color:rgba(255,255,255,.55)">
+        <span style="font-size:10px;letter-spacing:.24em;color:#C39C6C;text-transform:uppercase;margin-bottom:5px">Livraison Belgique</span>
+        <span>bpost · 2–3 jours</span><span>Offerte dès 80 €</span><span>Retour 14 jours</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:9px;font-size:13px;color:rgba(255,255,255,.55)">
+        <span style="font-size:10px;letter-spacing:.24em;color:#C39C6C;text-transform:uppercase;margin-bottom:5px">Livraison Suisse</span>
+        <span>Poste CH · 3–5 jours</span><span>Prix CHF indicatifs (1 € ≈ 0,94 CHF)</span><span>Douane à charge du client</span>
+      </div>
+    </div>
+    <div style="max-width:1400px;margin:0 auto;padding:20px 22px;border-top:1px solid rgba(255,255,255,.08);display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:11px;letter-spacing:.14em;color:rgba(255,255,255,.35);text-transform:uppercase">
+      <span>© 2026 Novawear — Revente sélective</span>
+      <span style="display:flex;gap:16px;align-items:center">
+        <span>Virement bancaire · Authenticité vérifiée</span>
+        <button onClick="{{ goAdmin }}" style="background:transparent;border:0;padding:0;color:rgba(255,255,255,.28);font-size:11px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;transition:color .4s cubic-bezier(.32,.94,.6,1)" style-hover="color:#C39C6C">Admin</button>
+      </span>
+    </div>
+  </footer>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:900},&quot;chfRate&quot;:{&quot;editor&quot;:&quot;float&quot;,&quot;default&quot;:0.94,&quot;min&quot;:0.8,&quot;max&quot;:1.2,&quot;step&quot;:0.01,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Boutique&quot;},&quot;adminCode&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;NOVA&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Boutique&quot;}}">
+const GOLD = '#C39C6C';
+let CHF_RATE = 0.94;
+const EASE = 'cubic-bezier(.32,.94,.6,1)';
+const WORDS = ['Havoc','Vortex','Static','Cipher','Onyx','Ember','Nomad','Rogue','Vandal','Halo','Drift','Kilo','Ravine','Sector','Pulse','Ghost','Metro','Atlas','Bravo','Cobalt','Delta','Echo','Fable','Grid','Helix','Ion','Jolt','Krypt','Lumen','Mirage','Nova','Orbit','Prism','Quartz','Rift','Slate','Tempo','Umbra','Vault','Warp','Xenon','Yuma','Zephyr','Aster','Basalt','Cinder','Dune','Eclipse','Flint','Granite','Horizon','Ivory','Junction','Lattice','Monolith','Nucleus','Obsidian','Pylon','Quantum','Radial','Solstice','Terra','Union','Vertex','Wraith','Yield','Zenith','Alloy','Beacon','Circuit','Domino','Fracture','Kismet','Lynx','Mantle','Nadir','Onset','Payload','Relic','Sable','Talon','Vector'];
+
+const APP = ['XS','S','M','L','XL','XXL'];
+const SNK = ['40','41','42','43','44','45','46'];
+const TU = ['TU'];
+const BELT = ['85','90','95','100'];
+const WOM = ['XS','S','M','L','XL'];
+const PANT = ['28','30','32','34','36'];
+
+const CATS = [
+  {id:'ts', code:'TS', label:'T-SHIRTS', subs:[
+    ['graph','Graphiques','Tee Graphic',19.9,APP],
+    ['over','Oversize','Tee Oversize',22.9,APP],
+    ['basic','Basiques premium','Tee Essential',14.9,APP],
+    ['brand','De marques','Tee Signature',29.9,APP]]},
+  {id:'sw', code:'SW', label:'SWEATS & HOODIES', subs:[
+    ['hood','Hoodies','Hoodie',34.9,APP],
+    ['crew','Crewnecks','Crewneck',29.9,APP],
+    ['zip','Zip hoodies','Hoodie Zip',39.9,APP]]},
+  {id:'pa', code:'PA', label:'PANTALONS', subs:[
+    ['jean','Jeans','Jean',32.9,PANT],
+    ['bag','Baggy','Baggy',29.9,PANT],
+    ['cargo','Cargo','Cargo',34.9,PANT],
+    ['jog','Joggers','Jogger',24.9,APP],
+    ['cas','Pantalons casual','Pantalon',27.9,PANT]]},
+  {id:'ve', code:'VE', label:'VESTES', subs:[
+    ['bomb','Bombers','Bomber',49.9,APP],
+    ['denim','Vestes en jean','Veste Denim',44.9,APP],
+    ['light','Vestes légères','Coach Jacket',39.9,APP],
+    ['down','Doudounes','Doudoune',59.9,APP],
+    ['street','Vestes streetwear','Veste Street',49.9,APP]]},
+  {id:'sn', code:'SN', label:'SNEAKERS', subs:[
+    ['life','Lifestyle','Sneaker',54.9,SNK],
+    ['run','Running','Runner',59.9,SNK],
+    ['bball','Basketball','Court',64.9,SNK],
+    ['ltd','Éditions limitées','Sneaker LTD',89.9,SNK]]},
+  {id:'ac', code:'AC', label:'ACCESSOIRES', subs:[
+    ['cap','Casquettes','Casquette',14.9,TU],
+    ['bon','Bonnets','Bonnet',11.9,TU],
+    ['sac','Sacs','Sac',29.9,TU],
+    ['lun','Lunettes','Lunettes',19.9,TU],
+    ['cein','Ceintures','Ceinture',17.9,BELT],
+    ['port','Portefeuilles','Portefeuille',19.9,TU]]},
+  {id:'fe', code:'FE', label:'FEMME', subs:[
+    ['top','Tops','Top',17.9,WOM],
+    ['hood','Hoodies','Hoodie W',34.9,WOM],
+    ['pant','Pantalons','Pantalon W',27.9,WOM],
+    ['jean','Jeans','Jean W',32.9,PANT],
+    ['veste','Vestes','Veste W',44.9,WOM],
+    ['ens','Ensembles','Ensemble',39.9,WOM]]}
+];
+
+
+const RANGE = (a, b) => Array.from({ length: b - a + 1 }, (_, i) => a + i);
+// Pools vérifiés visuellement photo par photo : chaque sous-catégorie ne reçoit que
+// des visuels du bon type de produit (plus de sneaker dans « Vestes », etc.).
+const POOLS = {
+  'ts/graph': RANGE(1, 10), 'ts/over': RANGE(11, 21), 'ts/basic': RANGE(22, 31), 'ts/brand': RANGE(32, 41),
+  'sw/hood': RANGE(42, 55).concat([66]), 'sw/crew': RANGE(56, 60), 'sw/zip': RANGE(61, 65).concat(RANGE(67, 69)),
+  'pa/jean': RANGE(70, 85), 'pa/bag': RANGE(86, 91), 'pa/cargo': RANGE(92, 103), 'pa/jog': RANGE(104, 112), 'pa/cas': RANGE(113, 121),
+  've/bomb': RANGE(122, 137), 've/denim': RANGE(138, 140), 've/light': RANGE(141, 153), 've/down': RANGE(154, 161), 've/street': RANGE(162, 169),
+  'sn/life': RANGE(170, 183), 'sn/run': RANGE(184, 195), 'sn/bball': RANGE(196, 203), 'sn/ltd': RANGE(204, 207),
+  'ac/cap': RANGE(208, 219), 'ac/bon': RANGE(220, 228), 'ac/sac': RANGE(229, 239), 'ac/lun': RANGE(240, 249), 'ac/cein': RANGE(250, 259), 'ac/port': RANGE(260, 269),
+  'fe/top': RANGE(270, 279), 'fe/hood': RANGE(280, 289).concat([329]), 'fe/pant': RANGE(290, 302), 'fe/jean': RANGE(303, 309), 'fe/veste': RANGE(310, 319), 'fe/ens': RANGE(320, 328)
+};
+
+const PHOTOS_PER_SUB = 10;
+const PHOTO_MAX = 329;
+const OFFSETS = [0,3,-2,6,2,9,-3,4,7,12];
+const BADGES = [null,'NOUVEAU',null,'DERNIÈRES PIÈCES',null,'EXCLU',null,null,'NOUVEAU',null];
+const DESCS = {
+  ts:"Coton peigné 240 g/m², coupe tenue à l'épaule et col renforcé. Pièce sourcée à l'unité, état vérifié avant mise en ligne.",
+  sw:"Molleton gratté 380 g/m², intérieur brossé, poignets et bas de corps côtelés. Coupe droite légèrement oversize.",
+  pa:"Denim ou twill épais, surpiqûres contrastées, taille mid-rise et jambe conforme au fit annoncé. Zip métal, passants renforcés.",
+  ve:"Doublure matelassée, zip pleine longueur et col monté. Coupe boxy urbaine, coupe-vent sur les épaules et le dos.",
+  sn:"Paire authentifiée, boîte d'origine incluse. Tige cuir / mesh, semelle amortissante, patine nulle à légère selon la pièce.",
+  ac:"Finitions cousues, matières premium et logo brodé discret. Pièce d'appoint pensée pour compléter une silhouette sombre.",
+  fe:"Coupe féminine ajustée aux épaules, matière confortable et tombé fluide. Palette neutre pensée pour se superposer."
+};
+const BANK_DEFAULT = { holder:'NOVAWEAR SAS', iban:'FR76 3000 4000 0300 0012 3456 789', bic:'BNPAFRPPXXX', bankName:'BNP Paribas — Paris 11e' };
+const BANK_FIELDS = [['holder','Titulaire du compte'],['iban','IBAN'],['bic','BIC / SWIFT'],['bankName','Banque']];
+const STAGES = [
+  ['valid','Paiement validé','Virement vérifié. Les fonds sont placés en séquestre, la boutique n\'y a pas accès.'],
+  ['prep','Colis en préparation','Article contrôlé une dernière fois, emballé et étiqueté.'],
+  ['courier','Remis au livreur','Le transporteur a pris en charge le colis.'],
+  ['transit','En transit','Le colis circule vers ton adresse.'],
+  ['delivered','Livré · fonds débloqués','Livraison confirmée : le séquestre libère le paiement à la boutique.']
+];
+const REASONS = ['Virement non reçu','Montant incorrect','Preuve illisible','Référence absente','Article épuisé'];
+const PRICES = [['all','Tous les prix',null,null],['a','Moins de 20 €',0,20],['b','20 – 35 €',20,35],['c','35 – 60 €',35,60],['d','Plus de 60 €',60,1e6]];
+const COUNTRIES = [['FR','France'],['BE','Belgique'],['CH','Suisse']];
+
+const fmtEur = v => v.toFixed(2).replace('.', ',') + ' €';
+const fmtChf = v => '≈ ' + (v * CHF_RATE).toFixed(2).replace('.', ',') + ' CHF';
+const photoPath = n => './assets/photos/img' + String(n).padStart(3, '0') + '.jpg';
+
+function buildCatalogue() {
+  const products = []; let sub = 0;
+  CATS.forEach(cat => {
+    let n = 1;
+    cat.subs.forEach(([sid, slabel, base, price, sizes]) => {
+      const pool = POOLS[cat.id + '/' + sid] || [];
+      const count = pool.length;
+      for (let i = 0; i < count; i++) {
+        const word = WORDS[(sub * 7 + i * 3) % WORDS.length];
+        const eur = Math.max(9.9, price + OFFSETS[i % OFFSETS.length]);
+        const cut = (sub + i) % 3;
+        const avail = sizes.length > 2 ? sizes.slice(cut === 2 ? 1 : 0, sizes.length - (cut === 1 ? 1 : 0)) : sizes;
+        products.push({
+          id: cat.id + '-' + sid + '-' + i,
+          ref: 'NW-' + cat.code + '-' + String(n).padStart(3, '0'),
+          name: (base + ' ' + word).toUpperCase(),
+          catId: cat.id, catLabel: cat.label, subId: sid, subLabel: slabel,
+          eurVal: eur, sizes: avail, badge: BADGES[(sub + i * 2) % BADGES.length],
+          desc: DESCS[cat.id], img: photoPath(pool[i]), pool: pool.slice()
+        });
+        n++;
+      }
+      sub++;
+    });
+  });
+  return products;
+}
+
+const LS = {
+  get(k, fb) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : fb; } catch (e) { return fb; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+};
+const K_CART = 'nw_cart_v1', K_ORDERS = 'nw_orders_v1', K_EXTRA = 'nw_extra_v1', K_DEL = 'nw_deleted_v1', K_BANK = 'nw_bank_v1';
+
+class Component extends DCLogic {
+  state = {
+    view: 'home', catId: null, subId: null, pid: null, mainImg: null,
+    q: '', size: null, price: 'all', chosen: null, addedMsg: '',
+    cart: LS.get(K_CART, []), country: 'FR',
+    step: 1, form: { name:'', email:'', phone:'', city:'', addr:'' }, proof: null, proofName: '', proofPdf: false, err: '',
+    orders: LS.get(K_ORDERS, []), lastRef: '',
+    extras: LS.get(K_EXTRA, []), deleted: LS.get(K_DEL, []),
+    bankInfo: { ...BANK_DEFAULT, ...LS.get(K_BANK, {}) }, bankDraft: null, bankMsg: '',
+    adminIn: false, codeInput: '', loginErr: false, adminTab: 'orders', adminQ: '',
+    openOrder: null, reasonSel: '', reasonText: '', reasonErr: false, trackInput: '', trackErr: '', trackRef: '',
+    np: { name:'', cat:'ts', sub:'graph', price:'', sizes:'S / M / L / XL', badge:'', photo:null, msg:'' }
+  };
+
+  catalogue() { if (!this._c) this._c = buildCatalogue(); return this._c; }
+  all() {
+    const del = new Set(this.state.deleted);
+    return [...this.state.extras, ...this.catalogue()].filter(p => !del.has(p.id));
+  }
+  top() { if (typeof window !== 'undefined') window.scrollTo(0, 0); }
+  save(patch) {
+    if (patch.cart) LS.set(K_CART, patch.cart);
+    if (patch.orders) LS.set(K_ORDERS, patch.orders);
+    if (patch.extras) LS.set(K_EXTRA, patch.extras);
+    if (patch.deleted) LS.set(K_DEL, patch.deleted);
+    if (patch.bankInfo) LS.set(K_BANK, patch.bankInfo);
+    this.setState(patch);
+  }
+
+  chip(active, small) {
+    return 'background:' + (active ? GOLD : 'transparent') + ';border:1px solid ' + (active ? GOLD : 'rgba(255,255,255,.16)') +
+      ';color:' + (active ? '#060606' : 'rgba(255,255,255,.55)') + ';font-size:' + (small ? '10px' : '11px') +
+      ';font-weight:' + (active ? '700' : '500') + ';letter-spacing:.1em;text-transform:uppercase;padding:' + (small ? '6px 10px' : '7px 13px') +
+      ';cursor:pointer;transition:border-color .4s ' + EASE + ',color .4s ' + EASE;
+  }
+
+  goCat = (catId, subId) => { this.setState({ view:'cat', catId, subId: subId||null, pid:null, q:'', size:null, price:'all' }); this.top(); };
+  goProduct = (p) => { this.setState({ view:'product', pid:p.id, catId:p.catId, subId:p.subId, chosen:null, addedMsg:'', mainImg:p.img }); this.top(); };
+
+  cartLines() {
+    const byId = new Map(this.all().map(p => [p.id, p]));
+    return this.state.cart.map(l => ({ ...l, p: byId.get(l.id) })).filter(l => l.p);
+  }
+  totals() {
+    const lines = this.cartLines();
+    const sub = lines.reduce((s, l) => s + l.p.eurVal * l.qty, 0);
+    const c = this.state.country;
+    let ship = 0;
+    if (c === 'FR') ship = sub >= 60 || sub === 0 ? 0 : 4.9;
+    else if (c === 'BE') ship = sub >= 80 || sub === 0 ? 0 : 6.9;
+    else ship = sub === 0 ? 0 : 9.9;
+    return { lines, sub, ship, total: sub + ship };
+  }
+
+  shrinkImage(file, cb) {
+    const fr = new FileReader();
+    fr.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const max = 700, sc = Math.min(1, max / Math.max(img.width, img.height));
+        const cv = document.createElement('canvas');
+        cv.width = Math.round(img.width * sc); cv.height = Math.round(img.height * sc);
+        cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+        cb(cv.toDataURL('image/jpeg', 0.72));
+      };
+      img.onerror = () => cb(fr.result);
+      img.src = fr.result;
+    };
+    fr.readAsDataURL(file);
+  }
+
+  renderVals() {
+    const st = this.state;
+    CHF_RATE = this.props.chfRate ?? 0.94;
+    const adminCode = String(this.props.adminCode ?? 'NOVA').trim().toUpperCase();
+    const all = this.all();
+    const { lines, sub, ship, total } = this.totals();
+    const cartCount = st.cart.reduce((s, l) => s + l.qty, 0);
+    const countryLabel = (COUNTRIES.find(c => c[0] === st.country) || [])[1];
+
+    const decorate = p => ({
+      ...p, eur: fmtEur(p.eurVal), chf: fmtChf(p.eurVal),
+      crumb: p.catLabel + ' · ' + p.subLabel, go: () => this.goProduct(p)
+    });
+
+    const countryChips = COUNTRIES.map(([id, label]) => ({
+      label, style: this.chip(st.country === id), go: () => this.setState({ country: id })
+    }));
+
+    const vals = {
+      cats: CATS.map(c => ({
+        label: c.label,
+        navStyle: 'background:transparent;border:0;padding:4px 0;cursor:pointer;white-space:nowrap;font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;transition:color .4s ' + EASE + ';color:' + (st.catId === c.id && st.view !== 'home' ? GOLD : 'rgba(255,255,255,.55)') + ';border-bottom:1px solid ' + (st.catId === c.id && st.view !== 'home' ? GOLD : 'transparent'),
+        go: () => this.goCat(c.id)
+      })),
+      cartBtnStyle: 'background:' + (cartCount ? GOLD : 'transparent') + ';border:1px solid ' + GOLD + ';color:' + (cartCount ? '#060606' : GOLD) + ';padding:9px 15px;font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;transition:background .4s ' + EASE + ',color .4s ' + EASE,
+      cartCount: String(cartCount).padStart(2, '0'),
+      totalCount: all.length,
+      q: st.q,
+      onSearch: e => { const v = e.target.value; this.setState({ q: v, size: null, price: 'all', subId: v ? null : st.subId, view: v ? 'cat' : (st.catId ? 'cat' : 'home') }); },
+      goHome: () => { this.setState({ view:'home', catId:null, subId:null, pid:null, q:'' }); this.top(); },
+      goCart: () => { this.setState({ view:'cart' }); this.top(); },
+      goCheckout: () => { this.setState({ view:'checkout', step:1, err:'' }); this.top(); },
+      goAdmin: () => { this.setState({ view:'admin' }); this.top(); },
+      goTrack: () => { this.setState({ view:'track', trackErr:'' }); this.top(); },
+      escrowSteps: [
+        ['01', 'Tu vires le montant', 'Le virement part vers le compte de séquestre, avec ta référence de commande en libellé.'],
+        ['02', 'Les fonds sont bloqués', 'Nous vérifions le virement et préparons le colis. L\'argent est immobilisé, pas encaissé.'],
+        ['03', 'Le colis part', 'Remise au transporteur, puis suivi étape par étape depuis ta référence.'],
+        ['04', 'Livraison confirmée', 'À la réception, et seulement là, le séquestre libère le paiement à la boutique.']
+      ].map(([num, title, desc]) => ({ num, title, desc })),
+      isHome: st.view === 'home', isList: st.view === 'cat', isProduct: st.view === 'product',
+      isCart: st.view === 'cart', isCheckout: st.view === 'checkout', isDone: st.view === 'done', isAdmin: st.view === 'admin', isTrack: st.view === 'track',
+      homeCats: CATS.map((c, ci) => {
+        const list = all.filter(p => p.catId === c.id);
+        return { label: c.label, subLine: c.subs.map(s => s[1]).join(' · '), count: list.length,
+          img: list.length ? list[list.length - 1].img : photoPath(1), go: () => this.goCat(c.id) };
+      }),
+      countryChips, country: countryLabel,
+      subtotal: fmtEur(sub), shipping: ship ? fmtEur(ship) : 'Offerte', total: fmtEur(total), totalChf: fmtChf(total),
+      resetFilters: () => this.setState({ size:null, price:'all', subId:null, q:'' }),
+      goFirstCat: () => this.goCat('ts'),
+      lastRef: st.lastRef
+    };
+
+    if (st.view === 'cat') {
+      const cat = CATS.find(c => c.id === st.catId);
+      const term = st.q.trim().toLowerCase();
+      let list = term ? all : all.filter(p => p.catId === st.catId && (!st.subId || p.subId === st.subId));
+      if (term) list = list.filter(p => (p.name + ' ' + p.ref + ' ' + p.subLabel + ' ' + p.catLabel).toLowerCase().includes(term));
+      if (st.size) list = list.filter(p => p.sizes.includes(st.size));
+      const pr = PRICES.find(x => x[0] === st.price);
+      if (pr[2] !== null) list = list.filter(p => p.eurVal >= pr[2] && p.eurVal < pr[3]);
+      const sizeSource = [...new Set((term ? all : all.filter(p => p.catId === st.catId)).flatMap(p => p.sizes))];
+      Object.assign(vals, {
+        listCat: term ? 'Recherche' : (cat ? cat.label : ''),
+        listSub: term ? '' : (st.subId && cat ? (cat.subs.find(s => s[0] === st.subId) || ['',''])[1] : ''),
+        listTitle: term ? '« ' + st.q + ' »' : (st.subId && cat ? (cat.subs.find(s => s[0] === st.subId) || ['',''])[1].toUpperCase() : (cat ? cat.label : '')),
+        subChips: term || !cat ? [] : [['', 'Tout'], ...cat.subs.map(s => [s[0], s[1]])].map(([id, label]) => ({
+          label, style: this.chip((st.subId || '') === id), go: () => this.setState({ subId: id || null })
+        })),
+        sizeChips: [{ label:'Toutes', style:this.chip(!st.size), go:() => this.setState({ size:null }) },
+          ...sizeSource.map(s => ({ label:s, style:this.chip(st.size === s), go:() => this.setState({ size:s }) }))],
+        priceChips: PRICES.map(([id, label]) => ({ label, style:this.chip(st.price === id), go:() => this.setState({ price:id }) })),
+        resultLine: list.length + (list.length > 1 ? ' articles' : ' article'),
+        products: list.slice(0, 120).map(decorate),
+        isEmpty: list.length === 0
+      });
+    }
+
+    if (st.view === 'product') {
+      const p = all.find(x => x.id === st.pid) || all[0];
+      const pool = Array.isArray(p.pool) ? p.pool.map(photoPath) : [p.img];
+      const thumbs = [p.img, ...pool.filter(x => x !== p.img)].slice(0, 4);
+      const main = st.mainImg || p.img;
+      Object.assign(vals, {
+        d: {
+          name: p.name, ref: p.ref, cat: p.catLabel, sub: p.subLabel, crumb: p.catLabel + ' · ' + p.subLabel,
+          eur: fmtEur(p.eurVal), chf: fmtChf(p.eurVal), badge: p.badge, desc: p.desc, mainImg: main,
+          thumbs: thumbs.map(img => ({ img, pick: () => this.setState({ mainImg: img }),
+            style: 'cursor:pointer;aspect-ratio:4/5;overflow:hidden;background:#111111;border:1px solid ' + (main === img ? GOLD : 'rgba(255,255,255,.10)') + ';transition:border-color .4s ' + EASE })),
+          sizes: p.sizes.map(s => ({ label: s, style: this.chip(st.chosen === s), pick: () => this.setState({ chosen: s, addedMsg: '' }) }))
+        },
+        related: all.filter(x => x.subId === p.subId && x.catId === p.catId && x.id !== p.id).slice(0, 5).map(decorate),
+        addedMsg: st.addedMsg,
+        goDetailCat: () => this.goCat(p.catId),
+        goDetailSub: () => this.goCat(p.catId, p.subId),
+        addToCart: () => {
+          const size = st.chosen || p.sizes[0];
+          const cart = st.cart.slice();
+          const i = cart.findIndex(l => l.id === p.id && l.size === size);
+          if (i >= 0) cart[i] = { ...cart[i], qty: cart[i].qty + 1 }; else cart.push({ id: p.id, size, qty: 1 });
+          this.save({ cart, chosen: size, addedMsg: 'Ajouté · taille ' + size });
+        }
+      });
+    }
+
+    if (st.view === 'cart') {
+      Object.assign(vals, {
+        cartEmpty: lines.length === 0, cartHasItems: lines.length > 0,
+        cartItems: lines.map((l, idx) => ({
+          name: l.p.name, ref: l.p.ref, size: l.size, qty: l.qty, img: l.p.img,
+          line: fmtEur(l.p.eurVal * l.qty),
+          inc: () => { const c = st.cart.slice(); c[idx] = { ...c[idx], qty: c[idx].qty + 1 }; this.save({ cart: c }); },
+          dec: () => { const c = st.cart.slice(); if (c[idx].qty <= 1) c.splice(idx, 1); else c[idx] = { ...c[idx], qty: c[idx].qty - 1 }; this.save({ cart: c }); },
+          remove: () => { const c = st.cart.slice(); c.splice(idx, 1); this.save({ cart: c }); }
+        }))
+      });
+    }
+
+    if (st.view === 'checkout') {
+      const ref = 'NW-' + new Date().getFullYear() + '-' + String(1041 + st.orders.length).padStart(4, '0');
+      const f = st.form;
+      Object.assign(vals, {
+        stepTitle: st.step === 1 ? 'Coordonnées de livraison' : 'Virement bancaire',
+        steps: [1, 2].map(n => ({ style: 'height:2px;flex:1;max-width:120px;background:' + (st.step >= n ? GOLD : 'rgba(255,255,255,.14)') })),
+        isStep1: st.step === 1, isStep2: st.step === 2, orderRef: ref, err: st.err,
+        proofImg: st.proof && !st.proofPdf ? st.proof : '', proofPdf: st.proofPdf ? st.proof : '', proofName: st.proofName,
+        f: {
+          name: f.name, email: f.email, phone: f.phone, city: f.city, addr: f.addr,
+          setName: e => this.setState({ form: { ...f, name: e.target.value } }),
+          setEmail: e => this.setState({ form: { ...f, email: e.target.value } }),
+          setPhone: e => this.setState({ form: { ...f, phone: e.target.value } }),
+          setCity: e => this.setState({ form: { ...f, city: e.target.value } }),
+          setAddr: e => this.setState({ form: { ...f, addr: e.target.value } })
+        },
+        bank: [...BANK_FIELDS.map(([k, label]) => ({ label, value: st.bankInfo[k] || '—', key: k })),
+          { label: 'Montant à virer', value: fmtEur(total), key: 'amount' },
+          { label: 'Référence à indiquer', value: ref, key: 'ref' }
+        ].map(b => ({ label: b.label, value: b.value,
+          valStyle: (b.key === 'iban' || b.key === 'amount' || b.key === 'ref')
+            ? "font-family:Jost,sans-serif;font-weight:600;font-size:15px;color:" + GOLD + ';letter-spacing:.04em'
+            : 'font-size:14px;color:#F5F5F5'
+        })),
+        toStep2: () => {
+          if (!f.name.trim() || !f.email.trim() || !f.addr.trim()) { this.setState({ err: 'Nom, email et adresse requis' }); return; }
+          this.setState({ step: 2, err: '' }); this.top();
+        },
+        backStep1: () => this.setState({ step: 1, err: '' }),
+        onProof: e => {
+          const file = e.target.files && e.target.files[0];
+          if (!file) return;
+          if (file.type === 'application/pdf') {
+            const fr = new FileReader();
+            fr.onload = () => this.setState({ proof: fr.result, proofPdf: true, proofName: file.name, err: '' });
+            fr.readAsDataURL(file);
+          } else {
+            this.shrinkImage(file, d => this.setState({ proof: d, proofPdf: false, proofName: file.name, err: '' }));
+          }
+        },
+        confirmPayment: () => {
+          if (!st.proof) { this.setState({ err: 'Joins la preuve de virement' }); return; }
+          const order = {
+            id: 'o' + Date.now(), ref, date: new Date().toLocaleString('fr-FR'),
+            customer: { ...f, country: countryLabel },
+            items: lines.map(l => ({ name: l.p.name, ref: l.p.ref, size: l.size, qty: l.qty, price: l.p.eurVal, img: l.p.img })),
+            shipping: ship, total, proof: st.proof, proofPdf: st.proofPdf, proofName: st.proofName, status: 'pending', reason: '', stage: 0
+          };
+          const orders = [order, ...st.orders];
+          this.save({ orders, cart: [], view: 'done', lastRef: ref, proof: null, proofPdf: false, proofName: '', step: 1 });
+          this.top();
+        }
+      });
+    }
+
+    if (st.view === 'track') {
+      const found = st.trackRef ? st.orders.find(o => o.ref.toUpperCase() === st.trackRef.toUpperCase()) : null;
+      const stage = found ? Math.min(found.stage || 0, STAGES.length - 1) : 0;
+      Object.assign(vals, {
+        trackInput: st.trackInput, trackErr: st.trackErr,
+        setTrack: e => this.setState({ trackInput: e.target.value, trackErr: '' }),
+        doTrack: () => {
+          const ref = st.trackInput.trim();
+          if (!ref) { this.setState({ trackErr: 'Saisis ta référence de commande' }); return; }
+          const o = st.orders.find(x => x.ref.toUpperCase() === ref.toUpperCase());
+          this.setState({ trackRef: o ? o.ref : '', trackErr: o ? '' : 'Aucune commande trouvée pour ' + ref });
+        },
+        trackFound: !!found,
+        track: found ? {
+          ref: found.ref, date: found.date, total: fmtEur(found.total),
+          count: found.items.reduce((s, i) => s + i.qty, 0) + ' article(s)',
+          pending: found.status === 'pending', rejected: found.status === 'rejected',
+          rejectedReason: found.reason || '—',
+          escrow: found.status === 'valid' && stage >= STAGES.length - 1 ? 'Fonds débloqués à la boutique' : 'Fonds bloqués en séquestre',
+          steps: STAGES.map((s, i) => {
+            const done = found.status === 'valid' && i < stage, current = found.status === 'valid' && i === stage;
+            const col = done ? 'rgba(255,255,255,.5)' : current ? GOLD : 'rgba(255,255,255,.25)';
+            return {
+              label: s[1], desc: s[2],
+              dotStyle: 'width:13px;height:13px;border-radius:50%;flex:0 0 auto;margin-top:4px;border:1px solid ' + col + ';background:' + (done || current ? col : 'transparent'),
+              labelStyle: "font-family:Jost,sans-serif;font-weight:600;font-size:13px;text-transform:uppercase;color:" + (current ? GOLD : done ? '#F5F5F5' : 'rgba(255,255,255,.35)'),
+              descStyle: 'font-size:12px;color:' + (current || done ? 'rgba(255,255,255,.6)' : 'rgba(255,255,255,.3)') + ';text-wrap:pretty',
+              lineStyle: 'width:1px;flex:1;min-height:22px;background:' + (done ? 'rgba(255,255,255,.3)' : 'rgba(255,255,255,.12)'),
+              last: i === STAGES.length - 1
+            };
+          })
+        } : null
+      });
+    }
+
+    if (st.view === 'admin') {
+      const pending = st.orders.filter(o => o.status === 'pending').length;
+      const valid = st.orders.filter(o => o.status === 'valid').length;
+      const revenue = st.orders.filter(o => o.status === 'valid').reduce((s, o) => s + o.total, 0);
+      const setOrder = (id, patch) => {
+        const orders = st.orders.map(o => o.id === id ? { ...o, ...patch } : o);
+        this.save({ orders, reasonErr: false, reasonSel: '', reasonText: '' });
+      };
+      const catObj = CATS.find(c => c.id === st.np.cat) || CATS[0];
+      const term = st.adminQ.trim().toLowerCase();
+      const adminList = (term ? all.filter(p => (p.name + ' ' + p.ref + ' ' + p.subLabel).toLowerCase().includes(term)) : all).slice(0, 80);
+
+      Object.assign(vals, {
+        needsLogin: !st.adminIn, adminIn: st.adminIn, codeInput: st.codeInput, loginErr: st.loginErr,
+        setCode: e => this.setState({ codeInput: e.target.value, loginErr: false }),
+        login: () => this.setState(s => s.codeInput.trim().toUpperCase() === adminCode ? { adminIn: true, loginErr: false, codeInput: '' } : { loginErr: true }),
+        logout: () => this.setState({ adminIn: false, view: 'home' }),
+        tabs: [['orders', 'Commandes · ' + st.orders.length], ['products', 'Articles'], ['bank', 'Coordonnées bancaires']].map(([id, label]) => ({
+          label, style: this.chip(st.adminTab === id), go: () => this.setState({ adminTab: id, bankDraft: null, bankMsg: '' })
+        })),
+        tabOrders: st.adminTab === 'orders', tabProducts: st.adminTab === 'products', tabBank: st.adminTab === 'bank',
+        bankForm: {
+          msg: st.bankMsg,
+          fields: BANK_FIELDS.map(([k, label]) => ({
+            label, value: (st.bankDraft || st.bankInfo)[k] || '', placeholder: BANK_DEFAULT[k],
+            set: e => this.setState({ bankDraft: { ...(this.state.bankDraft || this.state.bankInfo), [k]: e.target.value }, bankMsg: '' })
+          })),
+          preview: BANK_FIELDS.map(([k, label]) => ({ label, value: (st.bankDraft || st.bankInfo)[k] || '—' })),
+          save: () => {
+            const d = st.bankDraft || st.bankInfo;
+            if (!String(d.holder).trim() || !String(d.iban).trim() || !String(d.bic).trim()) { this.setState({ bankMsg: 'Titulaire, IBAN et BIC obligatoires' }); return; }
+            this.save({ bankInfo: { holder: d.holder.trim(), iban: d.iban.trim().toUpperCase(), bic: d.bic.trim().toUpperCase(), bankName: (d.bankName || '').trim() }, bankDraft: null, bankMsg: 'Coordonnées enregistrées — actives dès le prochain paiement' });
+          },
+          reset: () => this.setState({ bankDraft: { ...BANK_DEFAULT }, bankMsg: '' })
+        },
+        stats: [
+          { label: 'En attente', value: pending }, { label: 'Validées', value: valid },
+          { label: 'Rejetées', value: st.orders.filter(o => o.status === 'rejected').length },
+          { label: 'CA validé', value: fmtEur(revenue) }
+        ],
+        noOrders: st.orders.length === 0,
+        orders: st.orders.map(o => {
+          const open = st.openOrder === o.id;
+          const map = { pending: ['EN ATTENTE', GOLD], valid: ['VALIDÉE', '#8FBF7A'], rejected: ['REJETÉE', 'rgba(255,255,255,.5)'] };
+          let [lab, col] = map[o.status];
+          if (o.status === 'valid') lab = STAGES[Math.min(o.stage || 0, STAGES.length - 1)][1];
+          return {
+            ref: o.ref, date: o.date, total: fmtEur(o.total), open,
+            customerName: o.customer.name, customerLine: (o.customer.email || '') + ' · ' + o.customer.country,
+            statusLabel: lab,
+            statusStyle: 'border:1px solid ' + col + ';color:' + col + ';font-size:9px;font-weight:700;letter-spacing:.18em;padding:6px 10px;text-transform:uppercase;flex:0 0 auto',
+            toggleLabel: open ? 'Fermer' : 'Détail',
+            toggle: () => this.setState({ openOrder: open ? null : o.id, reasonSel: '', reasonText: '', reasonErr: false }),
+            items: o.items.map(it => ({ name: it.name, img: it.img, meta: it.ref + ' · Taille ' + it.size + ' · ×' + it.qty, line: fmtEur(it.price * it.qty) })),
+            shipping: o.shipping ? fmtEur(o.shipping) : 'Offerte',
+            address: [o.customer.addr, o.customer.city, o.customer.country].filter(Boolean).join(', '),
+            proofImg: o.proof && !o.proofPdf ? o.proof : '', proofPdf: o.proofPdf ? o.proof : '',
+            proofName: o.proofName || 'justificatif.pdf', noProof: !o.proof,
+            actionable: o.status === 'pending', decided: o.status !== 'pending',
+            decisionLine: o.status === 'valid' ? 'Paiement validé — commande à expédier.' : 'Rejetée — motif : ' + (o.reason || '—'),
+            reasonText: st.reasonText, reasonErr: st.reasonErr && open,
+            reasonChips: REASONS.map(r => ({ label: r, style: this.chip(st.reasonSel === r, true), go: () => this.setState({ reasonSel: r, reasonText: r, reasonErr: false }) })),
+            setReason: e => this.setState({ reasonText: e.target.value, reasonErr: false }),
+            isValid: o.status === 'valid',
+            stageTitle: STAGES[Math.min(o.stage || 0, STAGES.length - 1)][1],
+            stageDesc: STAGES[Math.min(o.stage || 0, STAGES.length - 1)][2],
+            stageChips: STAGES.map((s, i) => ({
+              label: (i + 1) + '. ' + s[1],
+              style: this.chip(i === (o.stage || 0), true) + (i < (o.stage || 0) ? ';opacity:.55' : ''),
+              go: () => setOrder(o.id, { stage: i })
+            })),
+            canAdvance: (o.stage || 0) < STAGES.length - 1,
+            advance: () => setOrder(o.id, { stage: Math.min((o.stage || 0) + 1, STAGES.length - 1) }),
+            escrowLine: (o.stage || 0) >= STAGES.length - 1 ? 'Séquestre libéré · paiement acquis' : 'Fonds en séquestre jusqu\'à la livraison',
+            validate: () => setOrder(o.id, { status: 'valid', reason: '', stage: 0 }),
+            reject: () => { if (!st.reasonText.trim()) { this.setState({ reasonErr: true }); return; } setOrder(o.id, { status: 'rejected', reason: st.reasonText.trim() }); },
+            reopen: () => setOrder(o.id, { status: 'pending', reason: '' })
+          };
+        }),
+        adminQ: st.adminQ, setAdminQ: e => this.setState({ adminQ: e.target.value }),
+        hasRemoved: st.deleted.length > 0, removedCount: st.deleted.length,
+        restoreLabel: st.deleted.length === 1 ? "Restaurer l'article supprimé" : 'Restaurer les ' + st.deleted.length + ' articles supprimés',
+        restoreAll: () => this.save({ deleted: [] }),
+        adminProducts: adminList.map(p => ({
+          name: p.name, ref: p.ref, img: p.img, eur: fmtEur(p.eurVal), crumb: p.catLabel + ' · ' + p.subLabel,
+          remove: () => this.save({ deleted: [...st.deleted, p.id], extras: st.extras.filter(x => x.id !== p.id) })
+        })),
+        np: {
+          name: st.np.name, price: st.np.price, sizes: st.np.sizes, photo: st.np.photo, msg: st.np.msg,
+          cat: st.np.cat, sub: st.np.sub,
+          catOptions: CATS.map(c => ({ value: c.id, label: c.label })),
+          subOptions: catObj.subs.map(s => ({ value: s[0], label: s[1] })),
+          badgeChips: [['', 'Aucun'], ['NOUVEAU', 'Nouveau'], ['DERNIÈRES PIÈCES', 'Dernières pièces'], ['EXCLU', 'Exclu']].map(([v, label]) => ({
+            label, style: this.chip(st.np.badge === v, true), go: () => this.setState({ np: { ...st.np, badge: v } })
+          })),
+          setName: e => this.setState({ np: { ...st.np, name: e.target.value, msg: '' } }),
+          setPrice: e => this.setState({ np: { ...st.np, price: e.target.value, msg: '' } }),
+          setSizes: e => this.setState({ np: { ...st.np, sizes: e.target.value } }),
+          setCat: e => { const c = CATS.find(x => x.id === e.target.value); this.setState({ np: { ...st.np, cat: c.id, sub: c.subs[0][0] } }); },
+          setSub: e => this.setState({ np: { ...st.np, sub: e.target.value } }),
+          onPhoto: e => { const file = e.target.files && e.target.files[0]; if (file) this.shrinkImage(file, d => this.setState({ np: { ...this.state.np, photo: d } })); },
+          submit: () => {
+            const n = st.np;
+            const price = parseFloat(String(n.price).replace(',', '.'));
+            if (!n.name.trim() || !price) { this.setState({ np: { ...n, msg: 'Nom et prix requis' } }); return; }
+            const cat = CATS.find(c => c.id === n.cat);
+            const subDef = cat.subs.find(s => s[0] === n.sub) || cat.subs[0];
+            const item = {
+              id: 'x' + Date.now(), ref: 'NW-' + cat.code + '-' + String(900 + st.extras.length + 1),
+              name: n.name.trim().toUpperCase(), catId: cat.id, catLabel: cat.label, subId: subDef[0], subLabel: subDef[1],
+              eurVal: price, sizes: n.sizes.split('/').map(s => s.trim()).filter(Boolean),
+              badge: n.badge || null, desc: DESCS[cat.id], img: n.photo || photoPath(1), pool: null
+            };
+            this.save({ extras: [item, ...st.extras], np: { ...n, name: '', price: '', photo: null, msg: 'Article ajouté · ' + item.ref } });
+          }
+        }
+      });
+    }
+    return vals;
+  }
+}
+
+</script>
+</body>
+</html>

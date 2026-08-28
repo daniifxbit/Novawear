@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="omelette-print-source" content="v1787666465864870 Catalogue DRIP DISTRICT 22.dc.html">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="./doc-page.js"></script>
+<script src="./image-slot.js"></script>
+<style>
+  html,body{margin:0;padding:0;}
+  *{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  *{animation-delay:-99s !important;animation-duration:.001s !important;animation-iteration-count:1 !important;animation-fill-mode:both !important;animation-play-state:running !important;transition-duration:0s !important;}
+  doc-page:not(:defined){visibility:hidden}
+  a{color:#C6A15B;text-decoration:none}
+</style>
+</helmet>
+<doc-page margin="0">
+  <div style="background:#0A0A0A;color:#F5F5F5;font-family:Archivo,'Helvetica Neue',Helvetica,sans-serif;font-size:13px;line-height:1.55">
+
+    <section style="padding:1in 0.55in 0.7in;display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px;border-bottom:1px solid #1f1f1f">
+      <img src="./assets/dd22-logo.jpeg" alt="DRIP DISTRICT 22" style="width:150px;height:150px;border-radius:50%;object-fit:cover;border:1px solid #2a2a2a"/>
+      <h1 style="font-family:'Archivo Black',sans-serif;font-size:52px;line-height:.9;letter-spacing:-.03em;margin:14px 0 0;text-transform:uppercase">WEAR THE <span style="color:#C6A15B">VIBE</span></h1>
+      <div style="position:relative;width:300px;height:1px;background:linear-gradient(90deg,transparent,#C6A15B,transparent);margin-top:10px">
+        <div style="position:absolute;left:26%;top:0;width:1px;height:14px;background:linear-gradient(#C6A15B,transparent)"></div>
+        <div style="position:absolute;left:50%;top:0;width:1px;height:28px;background:linear-gradient(#C6A15B,transparent)"></div>
+        <div style="position:absolute;left:71%;top:0;width:1px;height:9px;background:linear-gradient(#C6A15B,transparent)"></div>
+      </div>
+      <div style="font-size:12px;letter-spacing:.3em;color:#8A8A8A;text-transform:uppercase;margin-top:14px">Catalogue officiel · Saison 2026</div>
+      <div style="font-size:12px;letter-spacing:.2em;color:#8A8A8A;text-transform:uppercase">France · Belgique · Suisse</div>
+      <p style="max-width:420px;color:#a9a9a9;font-size:13px;margin:20px 0 0">Prix en euros, équivalent CHF indicatif (1 € ≈ 0,94 CHF). Références produit à conserver pour toute commande.</p>
+    </section>
+
+    <section style="padding:0.5in 0.55in 0.6in;border-bottom:1px solid #1f1f1f">
+      <div style="font-size:12px;letter-spacing:.28em;color:#C6A15B;text-transform:uppercase;margin-bottom:18px">Sommaire</div>
+      <sc-for list="{{ toc }}" as="t" hint-placeholder-count="7">
+        <div style="display:flex;gap:14px;align-items:baseline;padding:9px 0;border-bottom:1px solid #171717">
+          <span style="font-family:'Archivo Black',sans-serif;font-size:13px;color:#C6A15B;width:26px;flex:0 0 auto">{{ t.num }}</span>
+          <span style="font-family:'Archivo Black',sans-serif;font-size:15px;text-transform:uppercase;flex:0 0 auto">{{ t.label }}</span>
+          <span style="font-size:12px;color:#8A8A8A;flex:1">{{ t.subLine }}</span>
+          <span style="font-size:12px;color:#8A8A8A;letter-spacing:.14em;flex:0 0 auto">{{ t.count }} réf.</span>
+        </div>
+      </sc-for>
+    </section>
+
+    <sc-for list="{{ groups }}" as="g" hint-placeholder-count="7">
+      <section style="break-before:page;padding:0.55in 0.55in 0.4in">
+        <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap">
+          <span style="font-family:'Archivo Black',sans-serif;font-size:14px;color:#C6A15B">{{ g.num }}</span>
+          <h2 style="font-family:'Archivo Black',sans-serif;font-size:34px;line-height:1;letter-spacing:-.025em;margin:0;text-transform:uppercase">{{ g.label }}</h2>
+        </div>
+        <div style="position:relative;width:230px;height:1px;background:linear-gradient(90deg,#C6A15B,rgba(198,161,91,.15));margin:16px 0 6px">
+          <div style="position:absolute;left:14%;top:0;width:1px;height:12px;background:linear-gradient(#C6A15B,transparent)"></div>
+          <div style="position:absolute;left:41%;top:0;width:1px;height:22px;background:linear-gradient(#C6A15B,transparent)"></div>
+          <div style="position:absolute;left:66%;top:0;width:1px;height:8px;background:linear-gradient(rgba(198,161,91,.7),transparent)"></div>
+        </div>
+        <div style="font-size:12px;letter-spacing:.18em;color:#8A8A8A;text-transform:uppercase;margin-top:12px">{{ g.subLine }}</div>
+
+        <sc-for list="{{ g.subs }}" as="s" hint-placeholder-count="4">
+          <div style="margin-top:30px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;border-bottom:1px solid #1f1f1f;padding-bottom:9px;margin-bottom:16px">
+              <span style="font-family:'Archivo Black',sans-serif;font-size:17px;text-transform:uppercase;letter-spacing:-.01em">{{ s.label }}</span>
+              <span style="font-size:12px;letter-spacing:.16em;color:#8A8A8A;text-transform:uppercase">{{ s.range }}</span>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">
+              <sc-for list="{{ s.products }}" as="p" hint-placeholder-count="6">
+                <div style="border:1px solid #1f1f1f;background:#141414;display:flex;flex-direction:column">
+                  <div style="position:relative;aspect-ratio:4/5;background:#171717">
+                    <image-slot id="{{ p.ref }}" shape="rect" placeholder="{{ p.slotHint }}"></image-slot>
+                    <sc-if value="{{ p.badge }}" hint-placeholder-val="{{ false }}">
+                      <span style="position:absolute;top:8px;left:8px;background:rgba(10,10,10,.88);border:1px solid #C6A15B;color:#C6A15B;font-size:9px;font-weight:700;letter-spacing:.14em;padding:4px 7px;text-transform:uppercase">{{ p.badge }}</span>
+                    </sc-if>
+                  </div>
+                  <div style="padding:11px 12px 13px;display:flex;flex-direction:column;gap:6px;flex:1">
+                    <div style="font-family:'Archivo Black',sans-serif;font-size:13px;line-height:1.15;text-transform:uppercase">{{ p.name }}</div>
+                    <div style="font-size:12px;color:#8A8A8A;letter-spacing:.06em">{{ p.ref }}</div>
+                    <div style="font-size:12px;color:#8A8A8A">Tailles {{ p.sizeLine }}</div>
+                    <div style="margin-top:auto;padding-top:9px;border-top:1px solid #1f1f1f;display:flex;justify-content:space-between;align-items:baseline;gap:8px">
+                      <span style="font-family:'Archivo Black',sans-serif;font-size:15px;color:#C6A15B">{{ p.eur }}</span>
+                      <span style="font-size:11px;color:#8A8A8A">{{ p.chf }}</span>
+                    </div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+      </section>
+    </sc-for>
+
+    <section style="break-before:page;padding:0.6in 0.55in 0.8in">
+      <h2 style="font-family:'Archivo Black',sans-serif;font-size:28px;margin:0;text-transform:uppercase;letter-spacing:-.02em">Livraison & conditions</h2>
+      <div style="width:180px;height:1px;background:#C6A15B;margin:16px 0 26px"></div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px">
+        <div style="border:1px solid #1f1f1f;background:#141414;padding:18px">
+          <div style="font-size:12px;letter-spacing:.22em;color:#C6A15B;text-transform:uppercase;margin-bottom:12px">France</div>
+          <div style="color:#a9a9a9;font-size:13px;line-height:1.8">Colissimo suivi · 48 h<br/>Offerte dès 120 €<br/>Retour 14 jours</div>
+        </div>
+        <div style="border:1px solid #1f1f1f;background:#141414;padding:18px">
+          <div style="font-size:12px;letter-spacing:.22em;color:#C6A15B;text-transform:uppercase;margin-bottom:12px">Belgique</div>
+          <div style="color:#a9a9a9;font-size:13px;line-height:1.8">bpost · 2–3 jours<br/>Offerte dès 150 €<br/>Retour 14 jours</div>
+        </div>
+        <div style="border:1px solid #1f1f1f;background:#141414;padding:18px">
+          <div style="font-size:12px;letter-spacing:.22em;color:#C6A15B;text-transform:uppercase;margin-bottom:12px">Suisse</div>
+          <div style="color:#a9a9a9;font-size:13px;line-height:1.8">Poste CH · 3–5 jours<br/>Prix CHF indicatifs (1 € ≈ 0,94 CHF)<br/>Douane à charge du client</div>
+        </div>
+      </div>
+      <div style="margin-top:40px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;border-top:1px solid #1f1f1f;padding-top:34px">
+        <span style="font-family:'Archivo Black',sans-serif;font-size:18px;text-transform:uppercase">DRIP <span style="color:#C6A15B">DISTRICT</span> 22</span>
+        <span style="font-size:12px;letter-spacing:.3em;color:#8A8A8A;text-transform:uppercase">Wear the vibe</span>
+        <span style="font-size:12px;color:#5f5f5f;letter-spacing:.14em;text-transform:uppercase;margin-top:6px">© 2026 · Revente sélective · Authenticité vérifiée</span>
+      </div>
+    </section>
+  </div>
+</doc-page>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const CHF_RATE = 0.94;
+const WORDS = ['Havoc','Vortex','Static','Cipher','Onyx','Ember','Nomad','Rogue','Vandal','Halo','Drift','Kilo','Ravine','Sector','Pulse','Ghost','Metro','Atlas','Bravo','Cobalt','Delta','Echo','Fable','Grid','Helix','Ion','Jolt','Krypt','Lumen','Mirage','Nova','Orbit','Prism','Quartz','Rift','Slate','Tempo','Umbra','Vault','Warp','Xenon','Yuma','Zephyr','Aster','Basalt','Cinder','Dune','Eclipse','Flint','Granite','Horizon','Ivory','Junction','Lattice','Monolith','Nucleus','Obsidian','Pylon','Quantum','Radial','Solstice','Terra','Union','Vertex','Wraith','Yield','Zenith','Alloy','Beacon','Circuit','Domino','Fracture'];
+
+const APP = ['XS','S','M','L','XL','XXL'];
+const SNK = ['40','41','42','43','44','45','46'];
+const TU = ['TU'];
+const BELT = ['85','90','95','100'];
+const WOM = ['XS','S','M','L','XL'];
+const PANT = ['28','30','32','34','36'];
+
+const CATS = [
+  {id:'ts', code:'TS', label:'T-SHIRTS', subs:[
+    ['graph','Graphiques','Tee Graphic',44.9,APP],
+    ['over','Oversize','Tee Oversize',49.9,APP],
+    ['basic','Basiques premium','Tee Essential',34.9,APP],
+    ['brand','De marques','Tee Signature',69.9,APP]]},
+  {id:'sw', code:'SW', label:'SWEATS & HOODIES', subs:[
+    ['hood','Hoodies','Hoodie',89.9,APP],
+    ['crew','Crewnecks','Crewneck',79.9,APP],
+    ['zip','Zip hoodies','Hoodie Zip',99.9,APP]]},
+  {id:'pa', code:'PA', label:'PANTALONS', subs:[
+    ['jean','Jeans','Jean',89.9,PANT],
+    ['bag','Baggy','Baggy',84.9,PANT],
+    ['cargo','Cargo','Cargo',94.9,PANT],
+    ['jog','Joggers','Jogger',69.9,APP],
+    ['cas','Pantalons casual','Pantalon',74.9,PANT]]},
+  {id:'ve', code:'VE', label:'VESTES', subs:[
+    ['bomb','Bombers','Bomber',149.9,APP],
+    ['denim','Vestes en jean','Veste Denim',129.9,APP],
+    ['light','Vestes légères','Coach Jacket',119.9,APP],
+    ['down','Doudounes','Doudoune',199.9,APP],
+    ['street','Vestes streetwear','Veste Street',159.9,APP]]},
+  {id:'sn', code:'SN', label:'SNEAKERS', subs:[
+    ['life','Lifestyle','Sneaker',129.9,SNK],
+    ['run','Running','Runner',139.9,SNK],
+    ['bball','Basketball','Court',159.9,SNK],
+    ['ltd','Éditions limitées','Sneaker LTD',289.9,SNK]]},
+  {id:'ac', code:'AC', label:'ACCESSOIRES', subs:[
+    ['cap','Casquettes','Casquette',39.9,TU],
+    ['bon','Bonnets','Bonnet',29.9,TU],
+    ['sac','Sacs','Sac',79.9,TU],
+    ['lun','Lunettes','Lunettes',59.9,TU],
+    ['cein','Ceintures','Ceinture',49.9,BELT],
+    ['port','Portefeuilles','Portefeuille',54.9,TU]]},
+  {id:'fe', code:'FE', label:'FEMME', subs:[
+    ['top','Tops','Top',44.9,WOM],
+    ['hood','Hoodies','Hoodie W',89.9,WOM],
+    ['pant','Pantalons','Pantalon W',79.9,WOM],
+    ['jean','Jeans','Jean W',94.9,PANT],
+    ['veste','Vestes','Veste W',139.9,WOM],
+    ['ens','Ensembles','Ensemble',129.9,WOM]]}
+];
+
+const OFFSETS = [0, 10, -5, 20, 5, 35];
+const BADGES = [null,'NOUVEAU',null,'DERNIÈRES PIÈCES',null,'EXCLU'];
+
+const fmtEur = v => v.toFixed(2).replace('.', ',') + ' €';
+const fmtChf = v => '≈ ' + (v * CHF_RATE).toFixed(2).replace('.', ',') + ' CHF';
+
+class Component extends DCLogic {
+  renderVals() {
+    const groups = CATS.map((cat, ci) => {
+      let n = 1;
+      const subs = cat.subs.map((sub, si) => {
+        const [sid, slabel, base, price, sizes] = sub;
+        const subIdx = ci * 7 + si;
+        const products = [];
+        for (let i = 0; i < 6; i++) {
+          const word = WORDS[(subIdx * 7 + i * 3) % WORDS.length];
+          const eur = Math.max(19.9, price + OFFSETS[i]);
+          const cut = (subIdx + i) % 3;
+          const avail = sizes.length > 2 ? sizes.slice(cut === 2 ? 1 : 0, sizes.length - (cut === 1 ? 1 : 0)) : sizes;
+          products.push({
+            ref: 'DD22-' + cat.code + '-' + String(n).padStart(3, '0'),
+            name: (base + ' ' + word).toUpperCase(),
+            eurVal: eur, eur: fmtEur(eur), chf: fmtChf(eur),
+            sizeLine: avail.join(' · '),
+            slotHint: (base + ' ' + word).toLowerCase(),
+            badge: BADGES[(subIdx + i * 2) % 6]
+          });
+          n++;
+        }
+        const lo = Math.min(...products.map(p => p.eurVal)), hi = Math.max(...products.map(p => p.eurVal));
+        return { label: slabel, products, range: fmtEur(lo) + ' – ' + fmtEur(hi) };
+      });
+      return {
+        num: String(ci + 1).padStart(2, '0'), label: cat.label,
+        subLine: cat.subs.map(s => s[1]).join(' · '), subs,
+        count: cat.subs.length * 6
+      };
+    });
+    return {
+      groups,
+      toc: groups.map(g => ({ num: g.num, label: g.label, subLine: g.subLine, count: g.count }))
+    };
+  }
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<style>
+  html,body{margin:0;padding:0;background:#0A0A0A;}
+  *{box-sizing:border-box;}
+  a{color:#C6A15B;text-decoration:none;}
+  a:hover{color:#F5F5F5;}
+  input,button{font-family:inherit;}
+  ::-webkit-scrollbar{height:5px;width:7px}
+  ::-webkit-scrollbar-thumb{background:#2c2c2c}
+  ::-webkit-scrollbar-track{background:#0f0f0f}
+</style>
+</helmet>
+<div style="min-height:100vh;background:#0A0A0A;color:#F5F5F5;font-family:Archivo,'Helvetica Neue',Helvetica,sans-serif;font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased">
+
+  <header style="position:sticky;top:0;z-index:40;background:rgba(10,10,10,.95);backdrop-filter:blur(12px);border-bottom:1px solid #1c1c1c">
+    <div style="max-width:1320px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+      <div onClick="{{ goHome }}" style="cursor:pointer;display:flex;align-items:center;gap:10px;flex:0 0 auto">
+        <img src="./assets/dd22-logo.jpeg" alt="DRIP DISTRICT 22" style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:1px solid #2a2a2a"/>
+        <span style="display:flex;flex-direction:column;line-height:1">
+          <span style="font-family:'Archivo Black',sans-serif;font-size:15px;letter-spacing:.01em">DRIP <span style="color:#C6A15B">DISTRICT</span></span>
+          <span style="font-size:9px;letter-spacing:.34em;color:#8A8A8A;margin-top:3px">22 · WEAR THE VIBE</span>
+        </span>
+      </div>
+
+      <div style="flex:1 1 180px;min-width:150px;order:3;display:flex;align-items:center;gap:9px;border:1px solid #242424;background:#141414;padding:8px 12px">
+        <span style="width:8px;height:8px;border:1px solid #8A8A8A;border-radius:50%;flex:0 0 auto"></span>
+        <input value="{{ q }}" onChange="{{ onSearch }}" placeholder="Rechercher un article, une référence…" style="flex:1;min-width:0;background:transparent;border:0;outline:0;color:#F5F5F5;font-size:13px"/>
+      </div>
+
+      <div style="order:4;flex:0 0 auto;display:flex;align-items:center;gap:9px;border:1px solid #2a2320;padding:8px 14px;font-size:11px;font-weight:700;letter-spacing:.14em;color:#C6A15B;text-transform:uppercase">PANIER<span style="color:#F5F5F5;font-family:'Archivo Black',sans-serif;letter-spacing:0">{{ cartCount }}</span></div>
+
+      <nav style="order:5;flex:1 1 100%;display:flex;gap:20px;overflow-x:auto;padding:6px 0 2px;scrollbar-width:none">
+        <sc-for list="{{ cats }}" as="c" hint-placeholder-count="7">
+          <button onClick="{{ c.go }}" style="{{ c.navStyle }}" style-hover="color:#F5F5F5">{{ c.label }}</button>
+        </sc-for>
+      </nav>
+    </div>
+  </header>
+
+  <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+    <section style="max-width:1320px;margin:0 auto;padding:clamp(48px,9vw,110px) 20px clamp(30px,5vw,56px);display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px">
+      <span style="font-size:10px;letter-spacing:.36em;color:#8A8A8A;text-transform:uppercase">Streetwear premium · France · Belgique · Suisse</span>
+      <h1 style="font-family:'Archivo Black',sans-serif;font-size:clamp(44px,11vw,116px);line-height:.88;letter-spacing:-.035em;margin:6px 0 0;text-transform:uppercase">WEAR THE <span style="color:#C6A15B">VIBE</span></h1>
+      <div style="position:relative;width:min(420px,72vw);height:1px;background:linear-gradient(90deg,transparent,rgba(198,161,91,.35) 16%,#C6A15B 50%,rgba(198,161,91,.35) 84%,transparent);margin-top:14px">
+        <div style="position:absolute;left:23%;top:0;width:1px;height:15px;background:linear-gradient(#C6A15B,transparent)"></div>
+        <div style="position:absolute;left:48%;top:0;width:1px;height:31px;background:linear-gradient(#C6A15B,transparent)"></div>
+        <div style="position:absolute;left:62%;top:0;width:1px;height:9px;background:linear-gradient(#C6A15B,transparent)"></div>
+        <div style="position:absolute;left:78%;top:0;width:1px;height:21px;background:linear-gradient(#C6A15B,transparent)"></div>
+      </div>
+      <p style="max-width:520px;color:#8A8A8A;font-size:14px;margin:18px 0 0;text-wrap:pretty">Pièces et sneakers de marque sélectionnées à l'unité. Stock limité, authenticité vérifiée, expédition sous 48 h depuis l'Europe.</p>
+    </section>
+
+    <section style="max-width:1320px;margin:0 auto;padding:0 20px 90px">
+      <div style="display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;border-bottom:1px solid #1c1c1c;padding-bottom:14px;margin-bottom:28px">
+        <h2 style="font-family:'Archivo Black',sans-serif;font-size:clamp(18px,3.4vw,26px);letter-spacing:-.01em;margin:0;text-transform:uppercase">Le catalogue</h2>
+        <span style="font-size:11px;letter-spacing:.2em;color:#8A8A8A;text-transform:uppercase">7 catégories · {{ totalCount }} pièces</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,290px),1fr));gap:20px">
+        <sc-for list="{{ homeCats }}" as="c" hint-placeholder-count="7">
+          <div onClick="{{ c.go }}" style="cursor:pointer;border:1px solid #1c1c1c;background:#111;display:flex;flex-direction:column" style-hover="border-color:#C6A15B">
+            <div style="position:relative;aspect-ratio:4/5;overflow:hidden;background:#141414">
+              <div style="position:absolute;inset:0;transition:transform .45s cubic-bezier(.2,.7,.2,1)" style-hover="transform:scale(1.045)">
+                <image-slot id="{{ c.slotId }}" shape="rect" placeholder="{{ c.slotHint }}"></image-slot>
+              </div>
+              <div style="position:absolute;left:0;bottom:0;width:100%;padding:18px;background:linear-gradient(transparent,rgba(10,10,10,.92));pointer-events:none">
+                <div style="font-family:'Archivo Black',sans-serif;font-size:clamp(20px,2.6vw,28px);line-height:1;letter-spacing:-.02em;text-transform:uppercase">{{ c.label }}</div>
+                <div style="width:38px;height:1px;background:#C6A15B;margin:10px 0 8px"></div>
+                <div style="font-size:11px;letter-spacing:.14em;color:#8A8A8A;text-transform:uppercase">{{ c.subLine }}</div>
+              </div>
+            </div>
+            <div style="padding:13px 18px;display:flex;justify-content:space-between;align-items:center;font-size:11px;letter-spacing:.16em;color:#8A8A8A;text-transform:uppercase;border-top:1px solid #1c1c1c">
+              <span>{{ c.count }} pièces</span><span style="color:#C6A15B">Voir →</span>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+  </sc-if>
+
+  <sc-if value="{{ isList }}" hint-placeholder-val="{{ false }}">
+    <section style="max-width:1320px;margin:0 auto;padding:34px 20px 80px">
+      <div style="display:flex;align-items:center;gap:9px;font-size:11px;letter-spacing:.16em;color:#8A8A8A;text-transform:uppercase;margin-bottom:20px;flex-wrap:wrap">
+        <span onClick="{{ goHome }}" style="cursor:pointer;color:#8A8A8A" style-hover="color:#C6A15B">Catalogue</span>
+        <span style="color:#3a3a3a">/</span>
+        <span style="color:#F5F5F5">{{ listCat }}</span>
+        <sc-if value="{{ listSub }}" hint-placeholder-val="{{ false }}">
+          <span style="color:#3a3a3a">/</span><span style="color:#C6A15B">{{ listSub }}</span>
+        </sc-if>
+      </div>
+
+      <h1 style="font-family:'Archivo Black',sans-serif;font-size:clamp(30px,6.4vw,58px);line-height:.94;letter-spacing:-.03em;margin:0;text-transform:uppercase">{{ listTitle }}</h1>
+      <div style="position:relative;width:min(300px,60vw);height:1px;background:linear-gradient(90deg,#C6A15B,rgba(198,161,91,.15));margin:18px 0 26px">
+        <div style="position:absolute;left:12%;top:0;width:1px;height:13px;background:linear-gradient(#C6A15B,transparent)"></div>
+        <div style="position:absolute;left:34%;top:0;width:1px;height:24px;background:linear-gradient(#C6A15B,transparent)"></div>
+        <div style="position:absolute;left:57%;top:0;width:1px;height:8px;background:linear-gradient(rgba(198,161,91,.7),transparent)"></div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:14px;border-top:1px solid #1c1c1c;border-bottom:1px solid #1c1c1c;padding:18px 0;margin-bottom:30px">
+        <div style="display:flex;gap:9px;flex-wrap:wrap;align-items:center">
+          <span style="font-size:10px;letter-spacing:.22em;color:#5f5f5f;text-transform:uppercase;width:104px;flex:0 0 auto">Sous-catégorie</span>
+          <sc-for list="{{ subChips }}" as="s" hint-placeholder-count="5">
+            <button onClick="{{ s.go }}" style="{{ s.style }}" style-hover="border-color:#C6A15B;color:#F5F5F5">{{ s.label }}</button>
+          </sc-for>
+        </div>
+        <div style="display:flex;gap:9px;flex-wrap:wrap;align-items:center">
+          <span style="font-size:10px;letter-spacing:.22em;color:#5f5f5f;text-transform:uppercase;width:104px;flex:0 0 auto">Taille</span>
+          <sc-for list="{{ sizeChips }}" as="s" hint-placeholder-count="7">
+            <button onClick="{{ s.go }}" style="{{ s.style }}" style-hover="border-color:#C6A15B;color:#F5F5F5">{{ s.label }}</button>
+          </sc-for>
+        </div>
+        <div style="display:flex;gap:9px;flex-wrap:wrap;align-items:center">
+          <span style="font-size:10px;letter-spacing:.22em;color:#5f5f5f;text-transform:uppercase;width:104px;flex:0 0 auto">Prix</span>
+          <sc-for list="{{ priceChips }}" as="s" hint-placeholder-count="5">
+            <button onClick="{{ s.go }}" style="{{ s.style }}" style-hover="border-color:#C6A15B;color:#F5F5F5">{{ s.label }}</button>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:22px">
+        <span style="font-size:11px;letter-spacing:.2em;color:#8A8A8A;text-transform:uppercase">{{ resultLine }}</span>
+        <button onClick="{{ resetFilters }}" style="background:transparent;border:0;border-bottom:1px solid #333;color:#8A8A8A;font-size:11px;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;padding:2px 0" style-hover="color:#C6A15B;border-color:#C6A15B">Réinitialiser les filtres</button>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,240px),1fr));gap:20px">
+        <sc-for list="{{ products }}" as="p" hint-placeholder-count="8">
+          <div onClick="{{ p.go }}" style="cursor:pointer;border:1px solid #1c1c1c;background:#141414;display:flex;flex-direction:column" style-hover="border-color:#C6A15B">
+            <div style="position:relative;aspect-ratio:4/5;overflow:hidden;background:#171717">
+              <div style="position:absolute;inset:0;transition:transform .45s cubic-bezier(.2,.7,.2,1)" style-hover="transform:scale(1.05)">
+                <image-slot id="{{ p.ref }}" shape="rect" placeholder="{{ p.slotHint }}"></image-slot>
+              </div>
+              <sc-if value="{{ p.badge }}" hint-placeholder-val="{{ false }}">
+                <span style="position:absolute;top:10px;left:10px;background:rgba(10,10,10,.86);border:1px solid #C6A15B;color:#C6A15B;font-size:9px;font-weight:700;letter-spacing:.18em;padding:5px 9px;text-transform:uppercase;pointer-events:none">{{ p.badge }}</span>
+              </sc-if>
+            </div>
+            <div style="padding:15px 16px 17px;display:flex;flex-direction:column;gap:9px;flex:1">
+              <div style="font-size:9px;letter-spacing:.2em;color:#8A8A8A;text-transform:uppercase">{{ p.crumb }}</div>
+              <div style="font-family:'Archivo Black',sans-serif;font-size:15px;line-height:1.15;letter-spacing:-.005em;text-transform:uppercase">{{ p.name }}</div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:2px">
+                <sc-for list="{{ p.sizes }}" as="sz" hint-placeholder-count="4">
+                  <span style="font-size:10px;letter-spacing:.08em;color:#8A8A8A;border:1px solid #262626;padding:2px 6px">{{ sz }}</span>
+                </sc-for>
+              </div>
+              <div style="margin-top:auto;padding-top:11px;display:flex;justify-content:space-between;align-items:flex-end;gap:10px;border-top:1px solid #1f1f1f">
+                <div>
+                  <div style="font-family:'Archivo Black',sans-serif;font-size:17px;color:#C6A15B;letter-spacing:-.01em">{{ p.eur }}</div>
+                  <sc-if value="{{ showChf }}" hint-placeholder-val="{{ true }}">
+                    <div style="font-size:10px;color:#8A8A8A;letter-spacing:.06em;margin-top:2px">{{ p.chf }}</div>
+                  </sc-if>
+                </div>
+                <sc-if value="{{ showRefs }}" hint-placeholder-val="{{ true }}">
+                  <span style="font-size:9px;letter-spacing:.1em;color:#5f5f5f">{{ p.ref }}</span>
+                </sc-if>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+
+      <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ false }}">
+        <div style="border:1px solid #1c1c1c;padding:60px 24px;text-align:center;color:#8A8A8A;font-size:13px">Aucun article ne correspond à ces filtres.</div>
+      </sc-if>
+    </section>
+  </sc-if>
+
+  <sc-if value="{{ isProduct }}" hint-placeholder-val="{{ false }}">
+    <section style="max-width:1320px;margin:0 auto;padding:34px 20px 80px">
+      <div style="display:flex;align-items:center;gap:9px;font-size:11px;letter-spacing:.16em;color:#8A8A8A;text-transform:uppercase;margin-bottom:26px;flex-wrap:wrap">
+        <span onClick="{{ goHome }}" style="cursor:pointer" style-hover="color:#C6A15B">Catalogue</span>
+        <span style="color:#3a3a3a">/</span>
+        <span onClick="{{ goDetailCat }}" style="cursor:pointer" style-hover="color:#C6A15B">{{ d.cat }}</span>
+        <span style="color:#3a3a3a">/</span>
+        <span onClick="{{ goDetailSub }}" style="cursor:pointer;color:#C6A15B">{{ d.sub }}</span>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:clamp(24px,4vw,56px);align-items:start">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="position:relative;aspect-ratio:4/5;overflow:hidden;background:#141414;border:1px solid #1c1c1c">
+            <image-slot id="{{ d.mainSlot }}" shape="rect" placeholder="{{ d.slotHint }}"></image-slot>
+            <sc-if value="{{ d.badge }}" hint-placeholder-val="{{ false }}">
+              <span style="position:absolute;top:14px;left:14px;background:rgba(10,10,10,.86);border:1px solid #C6A15B;color:#C6A15B;font-size:9px;font-weight:700;letter-spacing:.18em;padding:6px 10px;text-transform:uppercase;pointer-events:none">{{ d.badge }}</span>
+            </sc-if>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+            <sc-for list="{{ d.thumbs }}" as="t" hint-placeholder-count="3">
+              <div style="position:relative;aspect-ratio:4/5;overflow:hidden;background:#141414;border:1px solid #1c1c1c" style-hover="border-color:#C6A15B">
+                <image-slot id="{{ t.id }}" shape="rect" placeholder="{{ t.hint }}"></image-slot>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:0">
+          <span style="font-size:10px;letter-spacing:.24em;color:#8A8A8A;text-transform:uppercase">{{ d.crumb }}</span>
+          <h1 style="font-family:'Archivo Black',sans-serif;font-size:clamp(28px,5.2vw,48px);line-height:.96;letter-spacing:-.03em;margin:14px 0 0;text-transform:uppercase">{{ d.name }}</h1>
+          <div style="position:relative;width:140px;height:1px;background:#C6A15B;margin:18px 0 22px">
+            <div style="position:absolute;left:18%;top:0;width:1px;height:14px;background:linear-gradient(#C6A15B,transparent)"></div>
+            <div style="position:absolute;left:62%;top:0;width:1px;height:8px;background:linear-gradient(#C6A15B,transparent)"></div>
+          </div>
+
+          <div style="display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap">
+            <span style="font-family:'Archivo Black',sans-serif;font-size:clamp(26px,4.6vw,38px);color:#C6A15B;letter-spacing:-.02em;line-height:1">{{ d.eur }}</span>
+            <sc-if value="{{ showChf }}" hint-placeholder-val="{{ true }}">
+              <span style="font-size:12px;color:#8A8A8A;letter-spacing:.06em">{{ d.chf }} · indicatif Suisse</span>
+            </sc-if>
+          </div>
+
+          <p style="color:#a9a9a9;font-size:14px;max-width:520px;margin:26px 0 0;text-wrap:pretty">{{ d.desc }}</p>
+
+          <div style="display:flex;flex-direction:column;gap:11px;margin:30px 0 0">
+            <span style="font-size:10px;letter-spacing:.24em;color:#5f5f5f;text-transform:uppercase">Tailles disponibles</span>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <sc-for list="{{ d.sizes }}" as="s" hint-placeholder-count="5">
+                <button onClick="{{ s.pick }}" style="{{ s.style }}" style-hover="border-color:#C6A15B;color:#F5F5F5">{{ s.label }}</button>
+              </sc-for>
+            </div>
+          </div>
+
+          <button onClick="{{ addToCart }}" style="margin-top:32px;background:#C6A15B;border:1px solid #C6A15B;color:#0A0A0A;font-family:'Archivo Black',sans-serif;font-size:13px;letter-spacing:.16em;text-transform:uppercase;padding:17px 26px;cursor:pointer;max-width:520px" style-hover="background:#0A0A0A;color:#C6A15B">Ajouter au panier</button>
+          <sc-if value="{{ justAdded }}" hint-placeholder-val="{{ false }}">
+            <span style="font-size:11px;letter-spacing:.16em;color:#C6A15B;text-transform:uppercase;margin-top:12px">Ajouté au panier · taille {{ chosenLabel }}</span>
+          </sc-if>
+
+          <div style="display:flex;flex-direction:column;gap:10px;margin-top:34px;border-top:1px solid #1c1c1c;padding-top:22px;font-size:12px;color:#8A8A8A">
+            <div style="display:flex;justify-content:space-between;gap:14px"><span style="letter-spacing:.14em;text-transform:uppercase;color:#5f5f5f">Référence</span><span style="color:#F5F5F5">{{ d.ref }}</span></div>
+            <div style="display:flex;justify-content:space-between;gap:14px"><span style="letter-spacing:.14em;text-transform:uppercase;color:#5f5f5f">Catégorie</span><span style="color:#F5F5F5">{{ d.crumb }}</span></div>
+            <div style="display:flex;justify-content:space-between;gap:14px"><span style="letter-spacing:.14em;text-transform:uppercase;color:#5f5f5f">Livraison</span><span style="color:#F5F5F5">FR · BE 48 h · CH 3–5 j</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:clamp(50px,8vw,86px)">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:14px;border-bottom:1px solid #1c1c1c;padding-bottom:13px;margin-bottom:24px">
+          <h2 style="font-family:'Archivo Black',sans-serif;font-size:clamp(16px,3vw,22px);margin:0;letter-spacing:-.01em;text-transform:uppercase">Dans la même sous-catégorie</h2>
+          <span onClick="{{ goDetailSub }}" style="cursor:pointer;font-size:11px;letter-spacing:.16em;color:#C6A15B;text-transform:uppercase">Tout voir →</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,200px),1fr));gap:18px">
+          <sc-for list="{{ related }}" as="p" hint-placeholder-count="5">
+            <div onClick="{{ p.go }}" style="cursor:pointer;border:1px solid #1c1c1c;background:#141414" style-hover="border-color:#C6A15B">
+              <div style="position:relative;aspect-ratio:4/5;overflow:hidden;background:#171717">
+                <div style="position:absolute;inset:0;transition:transform .45s cubic-bezier(.2,.7,.2,1)" style-hover="transform:scale(1.05)">
+                  <image-slot id="{{ p.ref }}" shape="rect" placeholder="{{ p.slotHint }}"></image-slot>
+                </div>
+              </div>
+              <div style="padding:13px 14px 15px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-family:'Archivo Black',sans-serif;font-size:13px;line-height:1.15;text-transform:uppercase">{{ p.name }}</div>
+                <div style="font-size:14px;color:#C6A15B;font-weight:700">{{ p.eur }}</div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+  </sc-if>
+
+  <footer style="border-top:1px solid #1c1c1c;background:#0d0d0d">
+    <div style="max-width:1320px;margin:0 auto;padding:54px 20px 30px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:36px">
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <img src="./assets/dd22-logo.jpeg" alt="DRIP DISTRICT 22" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:1px solid #2a2a2a"/>
+          <span style="font-family:'Archivo Black',sans-serif;font-size:15px">DRIP <span style="color:#C6A15B">DISTRICT</span> 22</span>
+        </div>
+        <span style="font-size:11px;letter-spacing:.3em;color:#8A8A8A;text-transform:uppercase">Wear the vibe</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:9px;font-size:13px;color:#8A8A8A">
+        <span style="font-size:10px;letter-spacing:.24em;color:#C6A15B;text-transform:uppercase;margin-bottom:5px">Livraison France</span>
+        <span>Colissimo suivi · 48 h</span><span>Offerte dès 120 €</span><span>Retour 14 jours</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:9px;font-size:13px;color:#8A8A8A">
+        <span style="font-size:10px;letter-spacing:.24em;color:#C6A15B;text-transform:uppercase;margin-bottom:5px">Livraison Belgique</span>
+        <span>bpost · 2–3 jours</span><span>Offerte dès 150 €</span><span>Retour 14 jours</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:9px;font-size:13px;color:#8A8A8A">
+        <span style="font-size:10px;letter-spacing:.24em;color:#C6A15B;text-transform:uppercase;margin-bottom:5px">Livraison Suisse</span>
+        <span>Poste CH · 3–5 jours</span><span>Prix CHF indicatifs (1 € ≈ 0,94 CHF)</span><span>Douane à charge du client</span>
+      </div>
+    </div>
+    <div style="max-width:1320px;margin:0 auto;padding:20px;border-top:1px solid #1a1a1a;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:11px;letter-spacing:.14em;color:#5f5f5f;text-transform:uppercase">
+      <span>© 2026 Drip District 22 — Revente sélective</span>
+      <span>Paiement sécurisé · Authenticité vérifiée</span>
+    </div>
+  </footer>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showChf&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Catalogue&quot;},&quot;showRefs&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Catalogue&quot;},&quot;productsPerSub&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:6,&quot;min&quot;:1,&quot;max&quot;:6,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Catalogue&quot;}}">
+const GOLD = '#C6A15B';
+const CHF_RATE = 0.94;
+const WORDS = ['Havoc','Vortex','Static','Cipher','Onyx','Ember','Nomad','Rogue','Vandal','Halo','Drift','Kilo','Ravine','Sector','Pulse','Ghost','Metro','Atlas','Bravo','Cobalt','Delta','Echo','Fable','Grid','Helix','Ion','Jolt','Krypt','Lumen','Mirage','Nova','Orbit','Prism','Quartz','Rift','Slate','Tempo','Umbra','Vault','Warp','Xenon','Yuma','Zephyr','Aster','Basalt','Cinder','Dune','Eclipse','Flint','Granite','Horizon','Ivory','Junction','Lattice','Monolith','Nucleus','Obsidian','Pylon','Quantum','Radial','Solstice','Terra','Union','Vertex','Wraith','Yield','Zenith','Alloy','Beacon','Circuit','Domino','Fracture'];
+
+const APP = ['XS','S','M','L','XL','XXL'];
+const SNK = ['40','41','42','43','44','45','46'];
+const TU = ['TU'];
+const BELT = ['85','90','95','100'];
+const WOM = ['XS','S','M','L','XL'];
+const PANT = ['28','30','32','34','36'];
+
+// [subId, label, baseName, basePrice, sizes]
+const CATS = [
+  {id:'ts', code:'TS', label:'T-SHIRTS', subs:[
+    ['graph','Graphiques','Tee Graphic',44.9,APP],
+    ['over','Oversize','Tee Oversize',49.9,APP],
+    ['basic','Basiques premium','Tee Essential',34.9,APP],
+    ['brand','De marques','Tee Signature',69.9,APP]]},
+  {id:'sw', code:'SW', label:'SWEATS & HOODIES', subs:[
+    ['hood','Hoodies','Hoodie',89.9,APP],
+    ['crew','Crewnecks','Crewneck',79.9,APP],
+    ['zip','Zip hoodies','Hoodie Zip',99.9,APP]]},
+  {id:'pa', code:'PA', label:'PANTALONS', subs:[
+    ['jean','Jeans','Jean',89.9,PANT],
+    ['bag','Baggy','Baggy',84.9,PANT],
+    ['cargo','Cargo','Cargo',94.9,PANT],
+    ['jog','Joggers','Jogger',69.9,APP],
+    ['cas','Pantalons casual','Pantalon',74.9,PANT]]},
+  {id:'ve', code:'VE', label:'VESTES', subs:[
+    ['bomb','Bombers','Bomber',149.9,APP],
+    ['denim','Vestes en jean','Veste Denim',129.9,APP],
+    ['light','Vestes légères','Coach Jacket',119.9,APP],
+    ['down','Doudounes','Doudoune',199.9,APP],
+    ['street','Vestes streetwear','Veste Street',159.9,APP]]},
+  {id:'sn', code:'SN', label:'SNEAKERS', subs:[
+    ['life','Lifestyle','Sneaker',129.9,SNK],
+    ['run','Running','Runner',139.9,SNK],
+    ['bball','Basketball','Court',159.9,SNK],
+    ['ltd','Éditions limitées','Sneaker LTD',289.9,SNK]]},
+  {id:'ac', code:'AC', label:'ACCESSOIRES', subs:[
+    ['cap','Casquettes','Casquette',39.9,TU],
+    ['bon','Bonnets','Bonnet',29.9,TU],
+    ['sac','Sacs','Sac',79.9,TU],
+    ['lun','Lunettes','Lunettes',59.9,TU],
+    ['cein','Ceintures','Ceinture',49.9,BELT],
+    ['port','Portefeuilles','Portefeuille',54.9,TU]]},
+  {id:'fe', code:'FE', label:'FEMME', subs:[
+    ['top','Tops','Top',44.9,WOM],
+    ['hood','Hoodies','Hoodie W',89.9,WOM],
+    ['pant','Pantalons','Pantalon W',79.9,WOM],
+    ['jean','Jeans','Jean W',94.9,PANT],
+    ['veste','Vestes','Veste W',139.9,WOM],
+    ['ens','Ensembles','Ensemble',129.9,WOM]]}
+];
+
+const OFFSETS = [0, 10, -5, 20, 5, 35];
+const BADGES = [null,'NOUVEAU',null,'DERNIÈRES PIÈCES',null,'EXCLU'];
+const DESCS = {
+  ts:"Coton peigné 240 g/m², coupe tenue à l'épaule et col renforcé. Sérigraphie durable, lavage à 30°. Pièce sourcée à l'unité, contrôlée avant mise en ligne.",
+  sw:"Molleton gratté 380 g/m², intérieur brossé, poignets et bas de corps côtelés. Coupe droite légèrement oversize, tombé structuré.",
+  pa:"Denim / twill épais avec surpiqûres contrastées, taille mid-rise et jambe conforme au fit annoncé. Passants renforcés, zip métal.",
+  ve:"Doublure matelassée, fermeture zip pleine longueur et col monté. Coupe boxy urbaine, coupe-vent sur les épaules et le dos.",
+  sn:"Paire authentifiée, boîte d'origine incluse. Tige cuir / mesh, semelle intercalaire amortissante, patine nulle à légère selon la pièce.",
+  ac:"Finitions cousues main, matières premium et logo brodé discret. Pièce d'appoint pensée pour compléter une silhouette sombre.",
+  fe:"Coupe féminine ajustée aux épaules, matière stretch confortable et tombé fluide. Palette neutre pensée pour se superposer."
+};
+
+function build() {
+  const products = [];
+  const byCat = {};
+  CATS.forEach((cat, ci) => {
+    byCat[cat.id] = [];
+    let n = 1;
+    cat.subs.forEach((sub, si) => {
+      const [sid, slabel, base, price, sizes] = sub;
+      const subIdx = ci * 7 + si;
+      for (let i = 0; i < 6; i++) {
+        const word = WORDS[(subIdx * 7 + i * 3) % WORDS.length];
+        const eur = Math.max(19.9, price + OFFSETS[i]);
+        const cut = (subIdx + i) % 3;
+        const avail = sizes.length > 2 ? sizes.slice(cut === 2 ? 1 : 0, sizes.length - (cut === 1 ? 1 : 0)) : sizes;
+        const p = {
+          id: cat.id + '-' + sid + '-' + i,
+          ref: 'DD22-' + cat.code + '-' + String(n).padStart(3, '0'),
+          name: (base + ' ' + word).toUpperCase(),
+          catId: cat.id, catLabel: cat.label, subId: sid, subLabel: slabel,
+          eurVal: eur, sizes: avail,
+          badge: BADGES[(subIdx + i * 2) % 6],
+          desc: DESCS[cat.id]
+        };
+        products.push(p); byCat[cat.id].push(p); n++;
+      }
+    });
+  });
+  return { products, byCat };
+}
+
+const fmtEur = v => v.toFixed(2).replace('.', ',') + ' €';
+const fmtChf = v => (v * CHF_RATE).toFixed(2).replace('.', ',') + ' CHF';
+
+const PRICES = [
+  ['all', 'Tous les prix', null, null],
+  ['a', 'Moins de 50 €', 0, 50],
+  ['b', '50 – 100 €', 50, 100],
+  ['c', '100 – 200 €', 100, 200],
+  ['d', 'Plus de 200 €', 200, 1e6]
+];
+
+class Component extends DCLogic {
+  state = { view: 'home', catId: null, subId: null, pid: null, q: '', size: null, price: 'all', cart: 0, chosen: null, added: false };
+
+  data() { if (!this._d) this._d = build(); return this._d; }
+
+  top() { if (typeof window !== 'undefined') window.scrollTo(0, 0); }
+
+  goCat = (catId, subId) => { this.setState({ view: 'cat', catId, subId: subId || null, pid: null, q: '', size: null, price: 'all' }); this.top(); };
+  goProduct = (p) => { this.setState({ view: 'product', pid: p.id, catId: p.catId, subId: p.subId, chosen: null, added: false }); this.top(); };
+
+  chipStyle(active) {
+    return 'background:' + (active ? GOLD : 'transparent') + ';border:1px solid ' + (active ? GOLD : '#262626') + ';color:' + (active ? '#0A0A0A' : '#8A8A8A') + ';font-size:11px;font-weight:' + (active ? '700' : '500') + ';letter-spacing:.1em;text-transform:uppercase;padding:7px 13px;cursor:pointer;transition:border-color .2s,color .2s';
+  }
+
+  renderVals() {
+    const st = this.state;
+    const { products, byCat } = this.data();
+    const showChf = this.props.showChf !== false;
+    const showRefs = this.props.showRefs !== false;
+    const perSub = Math.max(1, Math.min(6, this.props.productsPerSub ?? 6));
+
+    const pool = products.filter(p => Number(p.id.split('-')[2]) < perSub);
+    const decorate = p => ({
+      ...p, eur: fmtEur(p.eurVal), chf: fmtChf(p.eurVal),
+      crumb: p.catLabel + ' · ' + p.subLabel,
+      slotHint: p.name.toLowerCase(),
+      go: () => this.goProduct(p)
+    });
+
+    const cats = CATS.map(c => ({
+      label: c.label, id: c.id,
+      navStyle: 'background:transparent;border:0;padding:4px 0;cursor:pointer;white-space:nowrap;font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;transition:color .2s;color:' + (st.catId === c.id ? GOLD : '#8A8A8A') + ';border-bottom:1px solid ' + (st.catId === c.id ? GOLD : 'transparent'),
+      go: () => this.goCat(c.id)
+    }));
+
+    const vals = {
+      cats, showChf, showRefs,
+      totalCount: pool.length,
+      cartCount: String(st.cart).padStart(2, '0'),
+      q: st.q,
+      onSearch: e => { const v = e.target.value; this.setState({ q: v, size: null, price: 'all', subId: v ? null : st.subId, view: v ? 'cat' : (st.catId && st.view !== 'home' ? st.view : 'home') }); },
+      goHome: () => { this.setState({ view: 'home', catId: null, subId: null, pid: null, q: '' }); this.top(); },
+      isHome: st.view === 'home',
+      isList: st.view === 'cat',
+      isProduct: st.view === 'product',
+      homeCats: CATS.map(c => ({
+        label: c.label, subLine: c.subs.map(s => s[1]).join(' · '),
+        count: byCat[c.id].filter(p => Number(p.id.split('-')[2]) < perSub).length,
+        slotId: 'cat-' + c.id, slotHint: 'visuel ' + c.label.toLowerCase(),
+        go: () => this.goCat(c.id)
+      })),
+      resetFilters: () => this.setState({ size: null, price: 'all', subId: null, q: '' })
+    };
+
+    if (st.view === 'cat') {
+      const cat = CATS.find(c => c.id === st.catId);
+      const term = st.q.trim().toLowerCase();
+      let list = term ? pool : pool.filter(p => p.catId === st.catId && (!st.subId || p.subId === st.subId));
+      if (term) list = list.filter(p => p.name.toLowerCase().includes(term) || p.ref.toLowerCase().includes(term) || p.subLabel.toLowerCase().includes(term));
+      if (st.size) list = list.filter(p => p.sizes.includes(st.size));
+      const pr = PRICES.find(x => x[0] === st.price);
+      if (pr[2] !== null) list = list.filter(p => p.eurVal >= pr[2] && p.eurVal < pr[3]);
+
+      const sizeSource = term ? [...new Set(pool.flatMap(p => p.sizes))] : [...new Set(byCat[st.catId].flatMap(p => p.sizes))];
+      Object.assign(vals, {
+        listCat: term ? 'Recherche' : (cat ? cat.label : ''),
+        listSub: term ? '' : (st.subId && cat ? cat.subs.find(s => s[0] === st.subId)[1] : ''),
+        listTitle: term ? '« ' + st.q + ' »' : (st.subId && cat ? cat.subs.find(s => s[0] === st.subId)[1].toUpperCase() : (cat ? cat.label : '')),
+        subChips: term ? [] : (cat ? [['', 'Tout'], ...cat.subs.map(s => [s[0], s[1]])].map(([id, label]) => ({
+          label, style: this.chipStyle((st.subId || '') === id), go: () => this.setState({ subId: id || null })
+        })) : []),
+        sizeChips: [{ label: 'Toutes', style: this.chipStyle(!st.size), go: () => this.setState({ size: null }) },
+          ...sizeSource.map(s => ({ label: s, style: this.chipStyle(st.size === s), go: () => this.setState({ size: s }) }))],
+        priceChips: PRICES.map(([id, label]) => ({ label, style: this.chipStyle(st.price === id), go: () => this.setState({ price: id }) })),
+        resultLine: list.length + (list.length > 1 ? ' articles' : ' article'),
+        products: list.map(decorate),
+        isEmpty: list.length === 0
+      });
+    }
+
+    if (st.view === 'product') {
+      const p = products.find(x => x.id === st.pid) || products[0];
+      const rel = pool.filter(x => x.subId === p.subId && x.catId === p.catId && x.id !== p.id).slice(0, 5);
+      Object.assign(vals, {
+        d: {
+          name: p.name, ref: p.ref, cat: p.catLabel, sub: p.subLabel,
+          crumb: p.catLabel + ' · ' + p.subLabel,
+          eur: fmtEur(p.eurVal), chf: fmtChf(p.eurVal), badge: p.badge, desc: p.desc,
+          mainSlot: p.ref, slotHint: p.name.toLowerCase(),
+          thumbs: [2, 3, 4].map(i => ({ id: p.ref + '-' + i, hint: 'vue ' + i })),
+          sizes: p.sizes.map(s => ({ label: s, style: this.chipStyle(st.chosen === s), pick: () => this.setState({ chosen: s, added: false }) }))
+        },
+        related: rel.map(decorate),
+        justAdded: st.added,
+        chosenLabel: st.chosen || p.sizes[0],
+        goDetailCat: () => this.goCat(p.catId),
+        goDetailSub: () => this.goCat(p.catId, p.subId),
+        addToCart: () => this.setState(s => ({ cart: s.cart + 1, added: true, chosen: s.chosen || p.sizes[0] }))
+      });
+    }
+    return vals;
+  }
+}
+
+</script>
+</body>
+</html>
